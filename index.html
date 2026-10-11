@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio de Projets Web</title>
+    <link rel="shortcut icon" href="./favicon/favicon.ico" type="image/x-icon">
+    
+    <!-- Balises Open Graph pour le partage -->
+    <meta property="og:title" content="Portfolio de Projets Web">
+    <meta property="og:description" content="Découvrez une collection de mes projets et créations web.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://i.postimg.cc/pLxh2r7c/sittte.jpg">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- =============================================================================== -->
+    <!-- ================================ PARTIE CSS =================================== -->
+    <!-- =============================================================================== -->
+    <style>
+        :root[data-theme="default"] {
+            --primary-color: #34d399; --secondary-color: #10b981; --background-color: #0a0e14; --surface-color: #151922; --text-color: #e4e8f0; --text-muted-color: #8b96a8; --border-color: #242b38;
+        }
+        :root[data-theme="ocean"] {
+            --primary-color: #3b82f6; --secondary-color: #2563eb; --background-color: #0c1425; --surface-color: #1a2338; --text-color: #e2e8f0; --text-muted-color: #94a3b8; --border-color: #334155;
+        }
+        :root[data-theme="sunset"] {
+            --primary-color: #f97316; --secondary-color: #ea580c; --background-color: #1c100a; --surface-color: #2e1c13; --text-color: #fde6d8; --text-muted-color: #d1b8ab; --border-color: #573d2f;
+        }
+        :root {
+            --header-background: rgba(10, 14, 20, 0.85); --header-text-color: #ffffff; --success-color: #10b981; --danger-color: #ef4444; --warning-color: #f59e0b; --font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif; --border-radius: 16px; --border-radius-sm: 12px; --box-shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.6); --neon-glow-primary: 0 0 20px color-mix(in srgb, var(--primary-color) 40%, transparent), 0 0 40px color-mix(in srgb, var(--primary-color) 20%, transparent); --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--background-color); color: var(--text-color); font-family: var(--font-family); line-height: 1.6; transition: var(--transition); }
+        .container { width: 90%; max-width: 1200px; margin: 0 auto; }
+        header { padding: 1.2rem 0; position: sticky; top: 0; z-index: 1000; background: var(--header-background); backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--border-color); }
+        .header-content { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+        .logo { display: flex; align-items: center; gap: 14px; font-size: 1.6rem; font-weight: 800; color: var(--header-text-color); }
+        .logo i { font-size: 2.2rem; color: var(--primary-color); filter: drop-shadow(var(--neon-glow-primary)); }
+        .header-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+        .header-actions a, .header-actions button { color: var(--header-text-color); text-decoration: none; font-weight: 600; padding: 0.7rem 1.4rem; border-radius: var(--border-radius-sm); transition: var(--transition); font-family: var(--font-family); font-size: 1rem; }
+        .header-actions a:hover, .header-actions button:hover { background-color: rgba(128, 128, 128, 0.15); color: var(--primary-color); }
+        #import-btn, #theme-switcher-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted-color); padding: 0.6rem; width: auto; height: 44px; cursor: pointer; }
+        #import-btn { padding: 0 1.4rem; }
+        #theme-switcher-btn { width: 44px; }
+        #theme-switcher-btn:hover { transform: scale(1.1) rotate(-15deg); border-color: var(--primary-color); }
+        main { min-height: calc(100vh - 180px); padding: 3rem 0; }
+        .page-title { text-align: center; margin-bottom: 3rem; font-size: 2.5rem; font-weight: 800; }
+        .page-title i { color: var(--primary-color); margin-right: 1rem; }
+        .controls-container { margin-bottom: 3rem; }
+        .search-container { position: relative; margin-bottom: 1.5rem; }
+        .search-input { width: 100%; padding: 1.2rem 4rem; border: 2px solid var(--border-color); border-radius: 50px; font-size: 1rem; transition: var(--transition); background: var(--surface-color); color: var(--text-color); }
+        .search-input:focus { outline: none; border-color: var(--primary-color); box-shadow: var(--neon-glow-primary); }
+        .search-icon { position: absolute; left: 1.8rem; top: 50%; transform: translateY(-50%); color: var(--text-muted-color); }
+        .filter-container { display: flex; justify-content: flex-end; align-items: center; gap: 1rem; }
+        .filter-select { background-color: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 0.6rem 1rem; color: var(--text-color); font-weight: 500; cursor: pointer; transition: var(--transition); }
+        .filter-select:focus { outline: none; border-color: var(--primary-color); }
+        .site-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem; }
+        .site-card { background: var(--surface-color); border-radius: var(--border-radius); border: 1px solid var(--border-color); transition: var(--transition); display: flex; flex-direction: column; overflow: hidden; }
+        .site-card:hover { transform: translateY(-8px); box-shadow: var(--box-shadow-hover); border-color: var(--primary-color); }
+        .site-card-image { width: 100%; height: 200px; object-fit: cover; border-bottom: 1px solid var(--border-color); }
+        .site-card-content { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }
+        .site-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+        .site-card-header h3 { font-size: 1.5rem; color: var(--primary-color); margin: 0; line-height: 1.2; }
+        .site-year { background-color: var(--background-color); padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.9rem; font-weight: 600; white-space: nowrap; }
+        .site-card-body p { margin-bottom: 1rem; color: var(--text-muted-color); font-size: 0.95rem; }
+        .site-card-body p strong { color: var(--text-color); font-weight: 600; }
+        .site-card-body .description-block { background: var(--background-color); padding: 1rem; border-radius: var(--border-radius-sm); white-space: pre-wrap; font-style: italic; font-size: 0.9rem; }
+        .site-card-link { color: var(--primary-color); text-decoration: none; transition: var(--transition); word-break: break-all; font-weight: 600; }
+        .site-card-link:hover { text-decoration: underline; }
+        footer { color: var(--text-muted-color); padding: 2.5rem 0; margin-top: 3rem; border-top: 1px solid var(--border-color); text-align: center; }
+        .toast { position: fixed; bottom: 20px; right: 20px; color: white; padding: 1rem 1.5rem; border-radius: var(--border-radius); display: flex; align-items: center; gap: 1rem; z-index: 2000; opacity: 0; transform: translateY(100px); transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); backdrop-filter: blur(10px); }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .custom-alert-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); z-index: 9998; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
+        .custom-alert-overlay.show { opacity: 1; visibility: visible; }
+        .custom-alert-box { background: var(--surface-color); padding: 2.5rem; border-radius: var(--border-radius-lg); width: 90%; max-width: 450px; text-align: center; transform: scale(0.9); transition: transform 0.3s ease; }
+        .custom-alert-overlay.show .custom-alert-box { transform: scale(1); }
+        .custom-alert-box h3 { margin-bottom: 1rem; }
+        .custom-alert-box p { color: var(--text-muted-color); margin-bottom: 2rem; }
+        .custom-alert-buttons { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+        .btn { padding: 0.8rem 1.8rem; border-radius: var(--border-radius-sm); font-weight: 700; cursor: pointer; transition: var(--transition); border: none; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-success { background: var(--success-color); color: white; }
+        .btn-danger { background: var(--danger-color); color: white; }
+        .btn-secondary { background-color: var(--surface-hover); color: var(--text-color); border: 1px solid var(--border-color); }
+        .btn:hover { transform: translateY(-3px); box-shadow: var(--box-shadow-hover); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-folder-open"></i>
+                <span>Mes Projets - User</span>
+            </div>
+            <div class="header-actions">
+                <a href="https://wa.me/2250719030672?text=Salut%2C%0Aje%20viens%20de%20votre%20site%20user%20(%20*Qui%20pr%C3%A9sente%20les%20sites%20pour%20utilisateur*%20).%0Ale%20site%20est%20tr%C3%A8s%20bien%20fait%2C%20vraiment%20bravo." target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                <a href="https://jokersmilerprojet.netlify.app/tousmessites/" target="_blank" rel="noopener"><i class="fas fa-briefcase"></i> Mon Portfolio</a>
+                <!-- Bouton d'importation ajouté -->
+                <button id="import-btn" title="Importer un fichier JSON"><i class="fas fa-file-import"></i> Importer</button>
+                <button id="theme-switcher-btn" title="Changer de thème"><i class="fas fa-palette"></i></button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="container">
+    <section id="home">
+        <h2 class="page-title"><i class="fas fa-list"></i>Découvrez Mes Créations</h2>
+        <div class="controls-container">
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="Rechercher un projet...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            <div class="filter-container">
+                <label for="sort-select">Trier par :</label>
+                <select id="sort-select" class="filter-select">
+                    <option value="date-desc">Date d'ajout (plus récent)</option>
+                    <option value="date-asc">Date d'ajout (plus ancien)</option>
+                    <option value="name-asc">Titre (A-Z)</option>
+                    <option value="name-desc">Titre (Z-A)</option>
+                    <option value="year-desc">Année (plus récent)</option>
+                    <option value="year-asc">Année (plus ancien)</option>
+                </select>
+            </div>
+        </div>
+        <div id="site-list-container" class="site-list">
+            <!-- Les sites seront injectés ici. -->
+        </div>
+    </section>
+</main>
+
+<footer>
+    <p>&copy; 2025 - Tous droits réservés.</p>
+</footer>
+
+<!-- Éléments cachés -->
+<input type="file" id="import-file-input" accept=".json" style="display: none;">
+<div id="toast" class="toast"><i id="toast-icon"></i><span id="toast-message"></span></div>
+<div id="custom-alert-overlay" class="custom-alert-overlay">
+    <div class="custom-alert-box">
+        <h3 id="custom-alert-title"></h3>
+        <p id="custom-alert-message"></p>
+        <div id="custom-alert-buttons" class="custom-alert-buttons"></div>
+    </div>
+</div>
+
+<!-- =============================================================================== -->
+<!-- =============================== PARTIE JAVASCRIPT ============================= -->
+<!-- =============================================================================== -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const appState = { sites: [], currentSort: 'date-desc', themes: ['default', 'ocean', 'sunset'], currentThemeIndex: 0 };
+    const UIElements = {
+        siteListContainer: document.getElementById('site-list-container'),
+        searchInput: document.getElementById('search-input'),
+        sortSelect: document.getElementById('sort-select'),
+        themeSwitcherBtn: document.getElementById('theme-switcher-btn'),
+        importBtn: document.getElementById('import-btn'),
+        importFileInput: document.getElementById('import-file-input'),
+        toast: { element: document.getElementById('toast'), icon: document.getElementById('toast-icon'), message: document.getElementById('toast-message') },
+        alert: { overlay: document.getElementById('custom-alert-overlay'), title: document.getElementById('custom-alert-title'), message: document.getElementById('custom-alert-message'), buttons: document.getElementById('custom-alert-buttons') }
+    };
+
+    async function init() {
+        loadTheme();
+        initializeEventListeners();
+        await loadData();
+    }
+
+    async function loadData() {
+        const savedData = localStorage.getItem('siteFolioClientData');
+        if (savedData) {
+            appState.sites = JSON.parse(savedData);
+            displaySiteList();
+        } else {
+            await fetchSitesFromFile();
+        }
+    }
+
+    function saveDataToStorage() {
+        localStorage.setItem('siteFolioClientData', JSON.stringify(appState.sites));
+        displaySiteList();
+    }
+
+    async function fetchSitesFromFile() {
+        try {
+            const response = await fetch('sites.json');
+            if (!response.ok) throw new Error(); // Lance l'erreur pour être attrapée
+            const data = await response.json();
+            if (!Array.isArray(data)) throw new Error("Format de fichier invalide.");
+            appState.sites = data;
+            saveDataToStorage(); // Sauvegarde les données par défaut pour les prochaines visites
+        } catch (error) {
+            UIElements.siteListContainer.innerHTML = `<div style="text-align:center; color: var(--text-muted-color); grid-column: 1 / -1; background: var(--surface-color); padding: 2rem; border-radius: var(--border-radius);">
+                <h3><i class="fas fa-exclamation-triangle" style="color:var(--warning-color);"></i> Oups ! Les projets ne sont pas chargés.</h3>
+                <p style="margin-top: 1rem;">Il semble que le fichier de projets par défaut ne soit pas disponible.</p>
+                <p style="margin-top: 0.5rem;">Vous pouvez demander le fichier <code>sites.json</code> à l'administrateur via <a href="https://wa.me/2250719030672" target="_blank" rel="noopener" class="site-card-link">WhatsApp</a> et l'importer manuellement avec le bouton "Importer".</p>
+            </div>`;
+        }
+    }
+
+    function displaySiteList() {
+        UIElements.siteListContainer.innerHTML = '';
+        const searchTerm = normalizeString(UIElements.searchInput.value);
+
+        const filteredData = appState.sites.filter(site => 
+            normalizeString(site.title).includes(searchTerm) || normalizeString(site.url).includes(searchTerm) || normalizeString(site.description).includes(searchTerm) || normalizeString(site.problemStatement).includes(searchTerm)
+        );
+
+        filteredData.sort((a, b) => {
+            switch (appState.currentSort) {
+                case 'date-asc': return new Date(a.addedDate) - new Date(b.addedDate);
+                case 'name-asc': return a.title.localeCompare(b.title);
+                case 'name-desc': return b.title.localeCompare(a.title);
+                case 'year-desc': return (b.creationYear || 0) - (a.creationYear || 0);
+                case 'year-asc': return (a.creationYear || 0) - (b.creationYear || 0);
+                default: return new Date(b.addedDate) - new Date(a.addedDate);
+            }
+        });
+
+        if (filteredData.length === 0 && appState.sites.length > 0) {
+            UIElements.siteListContainer.innerHTML = `<p style="text-align:center; color: var(--text-muted-color); grid-column: 1 / -1;">Aucun projet ne correspond à votre recherche.</p>`;
+            return;
+        }
+
+        filteredData.forEach(site => {
+            const card = document.createElement('article');
+            card.className = 'site-card';
+            card.innerHTML = `
+                <img src="${site.imageData || 'siteimg.png'}" alt="Image pour ${site.title}" class="site-card-image" onerror="this.onerror=null;this.src='siteimg.png';">
+                <div class="site-card-content">
+                    <div class="site-card-header">
+                        <h3>${site.title}</h3>
+                        ${site.creationYear ? `<span class="site-year">${site.creationYear}</span>` : ''}
+                    </div>
+                    <div class="site-card-body">
+                        <p><strong>URL:</strong> <a href="${site.url}" target="_blank" rel="noopener noreferrer" class="site-card-link">${site.url}</a></p>
+                        ${site.description ? `<p><strong>Description :</strong></p><p class="description-block">${site.description}</p>` : ''}
+                        ${site.problemStatement ? `<p><strong>Problème résolu :</strong></p><p class="description-block">${site.problemStatement}</p>` : ''}
+                    </div>
+                </div>`;
+            UIElements.siteListContainer.appendChild(card);
+        });
+    }
+
+    async function handleImportClick() {
+        const result = await showConfirmation(
+            'Choisir une méthode d\'importation',
+            'Comment voulez-vous importer les nouveaux projets ?',
+            [
+                { text: 'Annuler', class: 'btn-secondary', value: 'cancel' },
+                { text: '<i class="fas fa-plus"></i> Fusionner', class: 'btn-success', value: 'merge' },
+                { text: '<i class="fas fa-exclamation-triangle"></i> Écraser', class: 'btn-danger', value: 'overwrite' }
+            ]
+        );
+
+        if (result === 'merge' || result === 'overwrite') {
+            UIElements.importFileInput.dataset.mode = result;
+            UIElements.importFileInput.click();
+        }
+    }
+
+    function handleFileUpload(event) {
+        const file = event.target.files[0];
+        const mode = event.target.dataset.mode;
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = e => {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                if (!Array.isArray(importedData)) throw new Error("Format JSON invalide.");
+
+                if (mode === 'overwrite') {
+                    appState.sites = importedData;
+                    showToast('Projets écrasés avec succès.', 'success');
+                } else if (mode === 'merge') {
+                    const existingIds = new Set(appState.sites.map(item => item.id));
+                    const newItems = importedData.filter(item => item.id && !existingIds.has(item.id));
+                    appState.sites.push(...newItems);
+                    showToast(`${newItems.length} nouveau(x) projet(s) ajouté(s).`, 'success');
+                }
+                saveDataToStorage();
+            } catch (err) {
+                showToast(`Erreur d'importation : ${err.message}`, 'error');
+            } finally {
+                event.target.value = '';
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function normalizeString(str) { return typeof str === 'string' ? str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : ''; }
+
+    function switchTheme() {
+        appState.currentThemeIndex = (appState.currentThemeIndex + 1) % appState.themes.length;
+        const newTheme = appState.themes[appState.currentThemeIndex];
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('siteFolioTheme', newTheme);
+        showToast(`Thème "${newTheme}" appliqué.`, 'success');
+    }
+
+    function loadTheme() {
+        const savedTheme = localStorage.getItem('siteFolioTheme') || 'default';
+        const themeIndex = appState.themes.indexOf(savedTheme);
+        appState.currentThemeIndex = themeIndex !== -1 ? themeIndex : 0;
+        document.documentElement.setAttribute('data-theme', appState.themes[appState.currentThemeIndex]);
+    }
+
+    function showToast(message, type = 'success') {
+        const toast = UIElements.toast;
+        toast.message.textContent = message;
+        const colors = { success: 'var(--success-color)', error: 'var(--danger-color)', warning: 'var(--warning-color)' };
+        const icons = { success: 'fa-check-circle', error: 'fa-times-circle', warning: 'fa-exclamation-triangle' };
+        toast.element.style.background = colors[type] || colors.success;
+        toast.icon.className = `fas ${icons[type] || icons.success}`;
+        toast.element.classList.add('show');
+        setTimeout(() => toast.element.classList.remove('show'), 3000);
+    }
+
+    function showConfirmation(title, message, buttons) {
+        return new Promise(resolve => {
+            const alert = UIElements.alert;
+            alert.title.textContent = title;
+            alert.message.textContent = message;
+            alert.buttons.innerHTML = '';
+
+            buttons.forEach(btnInfo => {
+                const button = document.createElement('button');
+                button.className = `btn ${btnInfo.class}`;
+                button.innerHTML = btnInfo.text;
+                button.onclick = () => {
+                    alert.overlay.classList.remove('show');
+                    resolve(btnInfo.value);
+                };
+                alert.buttons.appendChild(button);
+            });
+            alert.overlay.classList.add('show');
+        });
+    }
+    
+    function initializeEventListeners() {
+        UIElements.searchInput.addEventListener('input', displaySiteList);
+        UIElements.sortSelect.addEventListener('change', e => { appState.currentSort = e.target.value; displaySiteList(); });
+        UIElements.themeSwitcherBtn.addEventListener('click', switchTheme);
+        UIElements.importBtn.addEventListener('click', handleImportClick);
+        UIElements.importFileInput.addEventListener('change', handleFileUpload);
+    }
+    
+    init();
+});
+</script>
+
+</body>
+</html>

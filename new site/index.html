@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Blog Statique</title>
+    
+    <meta property="og:title" content="Mon Blog Statique Personnel">
+    <meta property="og:description" content="Découvrez mes articles, pensées et créations multimédias.">
+    <meta property="og:type" content="website">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- ================================ CSS INTÉGRÉ ================================= -->
+    <style>
+        :root[data-theme="default"] { --primary-color: #34d399; --secondary-color: #10b981; --background-color: #0a0e14; --surface-color: #151922; --text-color: #e4e8f0; --text-muted-color: #8b96a8; --border-color: #242b38; }
+        :root[data-theme="ocean"] { --primary-color: #3b82f6; --secondary-color: #2563eb; --background-color: #0c1425; --surface-color: #1a2338; --text-color: #e2e8f0; --text-muted-color: #94a3b8; --border-color: #334155; }
+        :root[data-theme="sunset"] { --primary-color: #f97316; --secondary-color: #ea580c; --background-color: #1c100a; --surface-color: #2e1c13; --text-color: #fde6d8; --text-muted-color: #d1b8ab; --border-color: #573d2f; }
+        :root { --header-background: rgba(10, 14, 20, 0.85); --success-color: #10b981; --danger-color: #ef4444; --warning-color: #f59e0b; --font-family: 'Inter', 'Segoe UI', sans-serif; --border-radius: 16px; --border-radius-sm: 12px; --box-shadow: 0 8px 32px rgba(0,0,0,0.4); --box-shadow-hover: 0 16px 48px rgba(0,0,0,0.6); --neon-glow-primary: 0 0 20px color-mix(in srgb, var(--primary-color) 40%, transparent), 0 0 40px color-mix(in srgb, var(--primary-color) 20%, transparent); --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--background-color); color: var(--text-color); font-family: var(--font-family); line-height: 1.6; transition: var(--transition); }
+        .container { width: 90%; max-width: 1200px; margin: 0 auto; }
+        .page { display: none; }
+        .page.active { display: block; animation: pageSlideIn 0.5s ease-out; }
+        @keyframes pageSlideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Header */
+        header { padding: 1.2rem 0; position: sticky; top: 0; z-index: 1000; background: var(--header-background); backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--border-color); }
+        .header-content { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+        .logo { display: flex; align-items: center; gap: 14px; font-size: 1.6rem; font-weight: 800; cursor: pointer; }
+        .logo i { color: var(--primary-color); filter: drop-shadow(var(--neon-glow-primary)); }
+        .header-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+        .nav-link, .header-btn { color: var(--text-color); text-decoration: none; font-weight: 600; padding: 0.7rem 1.4rem; border-radius: var(--border-radius-sm); transition: var(--transition); font-family: var(--font-family); font-size: 1rem; background: none; border: none; cursor: pointer; }
+        .nav-link.active { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: #000; font-weight: 700; box-shadow: var(--neon-glow-primary); }
+        .header-btn { border: 1px solid var(--border-color); color: var(--text-muted-color); height: 44px; }
+        .header-btn:hover, .nav-link:hover:not(.active) { background-color: rgba(128, 128, 128, 0.15); color: var(--primary-color); }
+        #theme-switcher-btn { width: 44px; } #theme-switcher-btn:hover { transform: scale(1.1) rotate(-15deg); border-color: var(--primary-color); }
+
+        /* Main Content & Controls */
+        main { min-height: calc(100vh - 200px); padding: 3rem 0; }
+        .page-title { text-align: center; margin-bottom: 3rem; font-size: 2.5rem; font-weight: 800; }
+        .page-title i { color: var(--primary-color); margin-right: 1rem; }
+        .controls-container { display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 3rem; }
+        .search-container { position: relative; flex-grow: 1; min-width: 300px; }
+        .search-input { width: 100%; padding: 1rem 3.5rem; border: 2px solid var(--border-color); border-radius: 50px; font-size: 1rem; transition: var(--transition); background: var(--surface-color); color: var(--text-color); }
+        .search-input:focus { outline: none; border-color: var(--primary-color); box-shadow: var(--neon-glow-primary); }
+        .search-icon { position: absolute; left: 1.5rem; top: 50%; transform: translateY(-50%); color: var(--text-muted-color); }
+        .filter-select { background-color: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 0.6rem 1rem; color: var(--text-color); font-weight: 500; cursor: pointer; }
+
+        /* Post List & Cards */
+        .post-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem; }
+        .post-card { background: var(--surface-color); border-radius: var(--border-radius); border: 1px solid var(--border-color); transition: var(--transition); display: flex; flex-direction: column; overflow: hidden; }
+        .post-card:hover { transform: translateY(-8px); box-shadow: var(--box-shadow-hover); border-color: var(--primary-color); }
+        .post-card-media { width: 100%; height: 220px; object-fit: cover; background-color: var(--background-color); }
+        .post-card-media iframe { width: 100%; height: 100%; border: none; }
+        .post-card-content { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }
+        .post-card-title { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 0.75rem; }
+        .post-card-meta { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted-color); margin-bottom: 1rem; }
+        .post-card-description { flex-grow: 1; margin-bottom: 1.5rem; line-height: 1.5; }
+        .post-card-footer { margin-top: auto; }
+        
+        /* Form */
+        .form-container { max-width: 800px; margin: 0 auto; background: var(--surface-color); padding: 2.5rem; border-radius: 24px; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+        .form-control { width: 100%; padding: 0.9rem 1rem; border: 2px solid var(--border-color); border-radius: var(--border-radius-sm); font-size: 1rem; transition: var(--transition); background: var(--background-color); color: var(--text-color); }
+        .form-control:focus { outline: none; border-color: var(--primary-color); }
+        textarea.form-control { min-height: 150px; resize: vertical; }
+        #media-preview { margin-top: 1rem; border-radius: var(--border-radius-sm); overflow: hidden; border: 2px solid var(--border-color); min-height: 50px; background-color: var(--background-color); }
+        #media-preview img, #media-preview iframe { width: 100%; height: auto; max-height: 400px; display: block; border: none; }
+        .form-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem; }
+        .btn { padding: 0.8rem 1.8rem; border-radius: var(--border-radius-sm); font-weight: 700; cursor: pointer; transition: var(--transition); border: none; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: #000; }
+        .btn-secondary { background-color: var(--surface-hover); color: var(--text-color); }
+        .btn-danger { background: var(--danger-color); color: white; }
+        .btn-success { background: var(--success-color); color: white; }
+        .btn:hover { transform: translateY(-3px); box-shadow: var(--box-shadow-hover); }
+
+        /* Single Post Page */
+        #single-post-page .container { max-width: 800px; }
+        #single-post-media { width: 100%; margin-bottom: 2rem; border-radius: var(--border-radius); overflow: hidden; }
+        #single-post-media img, #single-post-media iframe { width: 100%; height: auto; max-height: 500px; display: block; border: none; }
+        #single-post-title { font-size: 2.8rem; color: var(--primary-color); margin-bottom: 1rem; line-height: 1.2; }
+        .single-post-meta { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; color: var(--text-muted-color); margin-bottom: 2rem; }
+        #single-post-description { line-height: 1.7; font-size: 1.1rem; white-space: pre-wrap; word-wrap: break-word; }
+        #single-post-description a { color: var(--primary-color); text-decoration: underline; }
+        .single-post-cta { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); text-align: center; }
+
+        /* Footer & Modals */
+        footer { padding: 2.5rem 0; margin-top: 3rem; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-muted-color); }
+        footer a { color: var(--text-muted-color); transition: var(--transition); } footer a:hover { color: var(--primary-color); }
+        .toast { position: fixed; bottom: 20px; right: 20px; color: white; padding: 1rem 1.5rem; border-radius: var(--border-radius); z-index: 2000; opacity: 0; transform: translateY(100px); transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); backdrop-filter: blur(10px); display: flex; align-items: center; gap: 1rem; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .custom-alert-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 9998; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
+        .custom-alert-overlay.show { opacity: 1; visibility: visible; }
+        .custom-alert-box { background: var(--surface-color); padding: 2.5rem; border-radius: 24px; width: 90%; max-width: 450px; text-align: center; transform: scale(0.9); transition: transform 0.3s ease; }
+        .custom-alert-overlay.show .custom-alert-box { transform: scale(1); }
+        .custom-alert-box h3 { margin-bottom: 1rem; }
+        .custom-alert-box p { color: var(--text-muted-color); margin-bottom: 2rem; }
+        .custom-alert-buttons { display: flex; justify-content: center; gap: 1rem; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <div class="header-content">
+            <div class="logo" id="logo-btn">
+                <i class="fas fa-rss-square"></i>
+                <span>Mon Blog</span>
+            </div>
+            <div class="header-actions">
+                <a href="#" class="nav-link" id="add-post-nav-link"><i class="fas fa-plus"></i> Ajouter</a>
+                <button class="header-btn" id="import-btn"><i class="fas fa-file-import"></i> Importer</button>
+                <button class="header-btn" id="export-btn"><i class="fas fa-file-export"></i> Exporter</button>
+                <button class="header-btn" id="theme-switcher-btn" title="Changer de thème"><i class="fas fa-palette"></i></button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <!-- Page d'accueil (Liste des articles) -->
+    <section id="home-page" class="page active">
+        <div class="container">
+            <h2 class="page-title"><i class="fas fa-newspaper"></i>Derniers Articles</h2>
+            <div class="controls-container">
+                <div class="search-container">
+                    <input type="text" id="search-input" class="search-input" placeholder="Rechercher par titre, auteur, description...">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <div>
+                    <select id="sort-select" class="filter-select">
+                        <option value="date-desc">Plus récent</option>
+                        <option value="date-asc">Plus ancien</option>
+                        <option value="title-asc">Titre (A-Z)</option>
+                        <option value="title-desc">Titre (Z-A)</option>
+                    </select>
+                </div>
+            </div>
+            <div id="post-list-container" class="post-list">
+                <!-- Les articles seront injectés ici par JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Page d'ajout/modification d'un article -->
+    <section id="add-edit-page" class="page">
+        <div class="container">
+            <h2 class="page-title"><i class="fas fa-pencil-alt"></i><span id="form-title">Ajouter un Article</span></h2>
+            <div class="form-container">
+                <form id="post-form">
+                    <input type="hidden" id="post-id">
+                    <div class="form-group">
+                        <label for="post-title">Titre de l'article</label>
+                        <input type="text" id="post-title" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="post-media-url">Média (URL Image/Vidéo YouTube)</label>
+                        <input type="url" id="post-media-url" class="form-control" placeholder="https://exemple.com/image.png ou https://www.youtube.com/watch?v=...">
+                    </div>
+                     <div class="form-group">
+                        <label for="post-media-file">Ou choisir une image sur l'appareil</label>
+                        <input type="file" id="post-media-file" class="form-control" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label>Prévisualisation du Média</label>
+                        <div id="media-preview"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="post-description">Description</label>
+                        <textarea id="post-description" class="form-control"></textarea>
+                    </div>
+                     <div class="form-group">
+                        <label for="post-telegram">Lien Canal Telegram (facultatif)</label>
+                        <input type="url" id="post-telegram" class="form-control" placeholder="https://t.me/moncanal">
+                    </div>
+                     <div class="form-group">
+                        <label for="post-author">Auteur</label>
+                        <input type="text" id="post-author" class="form-control" value="Votre Nom" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" id="cancel-btn" class="btn btn-secondary">Annuler</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> <span id="save-btn-text">Publier</span></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Page de visualisation d'un article unique -->
+    <section id="single-post-page" class="page">
+        <div class="container">
+            <button id="back-to-home-btn" class="btn btn-secondary" style="margin-bottom: 2rem;"><i class="fas fa-arrow-left"></i> Retour</button>
+            <article>
+                <div id="single-post-media"></div>
+                <h1 id="single-post-title"></h1>
+                <div class="single-post-meta">
+                    <span id="single-post-author"></span>
+                    <span id="single-post-date"></span>
+                </div>
+                <div id="single-post-description"></div>
+                <div class="single-post-cta" id="single-post-telegram-cta">
+                    <!-- Le lien Telegram sera injecté ici -->
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2025 Mon Blog. Tous droits réservés.</p>
+        <p>
+            <a href="mailto:es2iprompter@gmail.com">Email</a> &bull; 
+            <a href="https://wa.me/2250719030672" target="_blank" rel="noopener">WhatsApp</a> &bull; 
+            <a href="https://jadpot.com" target="_blank" rel="noopener">Portfolio</a>
+        </p>
+    </div>
+</footer>
+
+<!-- Éléments cachés pour les modals et imports -->
+<input type="file" id="import-file-input" accept=".json" style="display: none;">
+<div id="toast" class="toast"><i id="toast-icon"></i><span id="toast-message"></span></div>
+<div id="custom-alert-overlay" class="custom-alert-overlay">
+    <div class="custom-alert-box">
+        <h3 id="custom-alert-title"></h3>
+        <p id="custom-alert-message"></p>
+        <div id="custom-alert-buttons" class="custom-alert-buttons"></div>
+    </div>
+</div>
+
+<!-- ============================ JAVASCRIPT INTÉGRÉ ============================ -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const appState = {
+        posts: [],
+        currentPage: 'home-page',
+        editingPostId: null,
+        currentSort: 'date-desc',
+        themes: ['default', 'ocean', 'sunset'],
+        currentThemeIndex: 0,
+    };
+
+    const UIElements = {
+        pages: document.querySelectorAll('.page'),
+        logoBtn: document.getElementById('logo-btn'),
+        addPostNavLink: document.getElementById('add-post-nav-link'),
+        postListContainer: document.getElementById('post-list-container'),
+        searchInput: document.getElementById('search-input'),
+        sortSelect: document.getElementById('sort-select'),
+        form: document.getElementById('post-form'),
+        formTitle: document.getElementById('form-title'),
+        postId: document.getElementById('post-id'),
+        postTitle: document.getElementById('post-title'),
+        postMediaUrl: document.getElementById('post-media-url'),
+        postMediaFile: document.getElementById('post-media-file'),
+        mediaPreview: document.getElementById('media-preview'),
+        postDescription: document.getElementById('post-description'),
+        postTelegram: document.getElementById('post-telegram'),
+        postAuthor: document.getElementById('post-author'),
+        saveBtnText: document.getElementById('save-btn-text'),
+        cancelBtn: document.getElementById('cancel-btn'),
+        singlePostPage: document.getElementById('single-post-page'),
+        singlePostMedia: document.getElementById('single-post-media'),
+        singlePostTitle: document.getElementById('single-post-title'),
+        singlePostAuthor: document.getElementById('single-post-author'),
+        singlePostDate: document.getElementById('single-post-date'),
+        singlePostDescription: document.getElementById('single-post-description'),
+        singlePostTelegramCta: document.getElementById('single-post-telegram-cta'),
+        backToHomeBtn: document.getElementById('back-to-home-btn'),
+        importBtn: document.getElementById('import-btn'),
+        exportBtn: document.getElementById('export-btn'),
+        importFileInput: document.getElementById('import-file-input'),
+        themeSwitcherBtn: document.getElementById('theme-switcher-btn'),
+        toast: { element: document.getElementById('toast'), icon: document.getElementById('toast-icon'), message: document.getElementById('toast-message') },
+        alert: { overlay: document.getElementById('custom-alert-overlay'), title: document.getElementById('custom-alert-title'), message: document.getElementById('custom-alert-message'), buttons: document.getElementById('custom-alert-buttons') }
+    };
+
+    function init() {
+        loadDataFromStorage();
+        loadTheme();
+        initializeEventListeners();
+        navigateTo('home-page');
+    }
+
+    function navigateTo(pageId) {
+        appState.currentPage = pageId;
+        UIElements.pages.forEach(p => p.classList.toggle('active', p.id === pageId));
+        UIElements.addPostNavLink.classList.toggle('active', pageId === 'add-edit-page');
+        window.scrollTo(0, 0);
+        if (pageId === 'home-page') {
+            displayPostList();
+        }
+    }
+
+    function loadDataFromStorage() {
+        const savedData = localStorage.getItem('staticBlogData');
+        appState.posts = savedData ? JSON.parse(savedData) : [];
+    }
+
+    function saveDataToStorage() {
+        localStorage.setItem('staticBlogData', JSON.stringify(appState.posts));
+    }
+
+    function displayPostList() {
+        UIElements.postListContainer.innerHTML = '';
+        const searchTerm = normalizeString(UIElements.searchInput.value);
+
+        const filteredPosts = appState.posts.filter(post =>
+            normalizeString(post.title).includes(searchTerm) ||
+            normalizeString(post.description).includes(searchTerm) ||
+            normalizeString(post.author).includes(searchTerm)
+        );
+
+        filteredPosts.sort((a, b) => {
+            switch (appState.currentSort) {
+                case 'date-asc': return new Date(a.createdAt) - new Date(b.createdAt);
+                case 'title-asc': return a.title.localeCompare(b.title);
+                case 'title-desc': return b.title.localeCompare(a.title);
+                default: return new Date(b.createdAt) - new Date(a.createdAt);
+            }
+        });
+        
+        if(filteredPosts.length === 0) {
+            UIElements.postListContainer.innerHTML = `<p style="text-align:center; color: var(--text-muted-color); grid-column: 1 / -1;">Aucun article trouvé. Cliquez sur "Ajouter" pour en créer un !</p>`;
+            return;
+        }
+
+        filteredPosts.forEach(post => {
+            const card = document.createElement('div');
+            card.className = 'post-card';
+            
+            const mediaHTML = getEmbedUrl(post.mediaUrl) 
+                ? `<div class="post-card-media"><iframe src="${getEmbedUrl(post.mediaUrl)}" allowfullscreen></iframe></div>`
+                : `<img src="${post.mediaUrl || post.mediaData || ''}" class="post-card-media" onerror="this.style.display='none'">`;
+
+            const truncatedDesc = post.description.length > 150 ? post.description.substring(0, 150) + '...' : post.description;
+            const formattedDate = new Date(post.createdAt).toLocaleString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+            card.innerHTML = `
+                ${mediaHTML}
+                <div class="post-card-content">
+                    <h3 class="post-card-title">${post.title}</h3>
+                    <div class="post-card-meta">
+                        <span><i class="fas fa-user"></i> ${post.author}</span>
+                        <span><i class="fas fa-clock"></i> ${formattedDate}</span>
+                    </div>
+                    <p class="post-card-description">${truncatedDesc}</p>
+                    <div class="post-card-footer">
+                        <button class="btn btn-primary read-more-btn" data-id="${post.id}">Voir Plus <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+            `;
+            UIElements.postListContainer.appendChild(card);
+        });
+    }
+    
+    function displaySinglePost(postId) {
+        const post = appState.posts.find(p => p.id === postId);
+        if(!post) return;
+
+        const mediaHTML = getEmbedUrl(post.mediaUrl) 
+            ? `<iframe src="${getEmbedUrl(post.mediaUrl)}" allowfullscreen style="aspect-ratio: 16/9; width: 100%; height: auto;"></iframe>`
+            : `<img src="${post.mediaUrl || post.mediaData || ''}" onerror="this.style.display='none'">`;
+        
+        UIElements.singlePostMedia.innerHTML = mediaHTML;
+        UIElements.singlePostTitle.textContent = post.title;
+        UIElements.singlePostAuthor.innerHTML = `<i class="fas fa-user"></i> Auteur : <strong>${post.author}</strong>`;
+        UIElements.singlePostDate.innerHTML = `<i class="fas fa-calendar-alt"></i> Publié le ${new Date(post.createdAt).toLocaleString('fr-FR', { dateStyle: 'full', timeStyle: 'short' })}`;
+        UIElements.singlePostDescription.innerHTML = linkify(post.description);
+
+        if (post.telegramUrl) {
+            UIElements.singlePostTelegramCta.innerHTML = `<a href="${post.telegramUrl}" target="_blank" rel="noopener" class="btn btn-primary"><i class="fab fa-telegram-plane"></i> Rejoindre le Canal Telegram</a>`;
+            UIElements.singlePostTelegramCta.style.display = 'block';
+        } else {
+            UIElements.singlePostTelegramCta.style.display = 'none';
+        }
+        
+        navigateTo('single-post-page');
+    }
+
+    function handleFormSubmit(e) {
+        e.preventDefault();
+        const id = UIElements.postId.value;
+        const postData = {
+            title: UIElements.postTitle.value.trim(),
+            mediaUrl: UIElements.postMediaUrl.value.trim(),
+            mediaData: UIElements.mediaPreview.querySelector('img')?.src.startsWith('data:') ? UIElements.mediaPreview.querySelector('img').src : null,
+            description: UIElements.postDescription.value,
+            telegramUrl: UIElements.postTelegram.value.trim(),
+            author: UIElements.postAuthor.value.trim(),
+        };
+
+        if (id) { // Update
+            const index = appState.posts.findIndex(p => p.id === id);
+            if(index > -1) {
+                appState.posts[index] = { ...appState.posts[index], ...postData };
+                showToast('Article mis à jour !', 'success');
+            }
+        } else { // Create
+            postData.id = 'post-' + Date.now();
+            postData.createdAt = new Date().toISOString();
+            appState.posts.push(postData);
+            showToast('Article publié avec succès !', 'success');
+        }
+        
+        saveDataToStorage();
+        UIElements.form.reset();
+        UIElements.mediaPreview.innerHTML = '';
+        navigateTo('home-page');
+    }
+    
+    function prepareAddForm() {
+        appState.editingPostId = null;
+        UIElements.form.reset();
+        UIElements.mediaPreview.innerHTML = '';
+        UIElements.formTitle.textContent = 'Ajouter un Article';
+        UIElements.saveBtnText.textContent = 'Publier';
+        UIElements.postAuthor.value = localStorage.getItem('blogAuthorName') || 'Votre Nom';
+        navigateTo('add-edit-page');
+    }
+
+    function updateMediaPreview() {
+        const url = UIElements.postMediaUrl.value.trim();
+        const file = UIElements.postMediaFile.files[0];
+        UIElements.mediaPreview.innerHTML = '';
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                UIElements.mediaPreview.innerHTML = `<img src="${e.target.result}" alt="Prévisualisation">`;
+            };
+            reader.readAsDataURL(file);
+            UIElements.postMediaUrl.value = '';
+        } else if (url) {
+            const embedUrl = getEmbedUrl(url);
+            if (embedUrl) {
+                UIElements.mediaPreview.innerHTML = `<iframe src="${embedUrl}" allowfullscreen style="width:100%; aspect-ratio: 16/9;"></iframe>`;
+            } else {
+                UIElements.mediaPreview.innerHTML = `<img src="${url}" alt="Prévisualisation">`;
+            }
+        }
+    }
+
+    function getEmbedUrl(url) {
+        let embedUrl = null;
+        const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+        const youtubeMatch = url.match(youtubeRegex);
+        if (youtubeMatch) {
+            embedUrl = `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+        }
+        return embedUrl;
+    }
+
+    function normalizeString(str) { return typeof str === 'string' ? str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : ''; }
+    function linkify(text) { const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig; return text.replace(urlRegex, url => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`); }
+    
+    function showToast(message, type = 'success') {
+        const toast = UIElements.toast;
+        const colors = { success: 'var(--success-color)', error: 'var(--danger-color)'};
+        const icons = { success: 'fa-check-circle', error: 'fa-times-circle'};
+        toast.element.style.background = colors[type];
+        toast.icon.className = `fas ${icons[type]}`;
+        toast.message.textContent = message;
+        toast.element.classList.add('show');
+        setTimeout(() => toast.element.classList.remove('show'), 3000);
+    }
+
+    function showConfirmation(title, message, buttons) {
+        return new Promise(resolve => {
+            const alert = UIElements.alert;
+            alert.title.textContent = title;
+            alert.message.textContent = message;
+            alert.buttons.innerHTML = '';
+            buttons.forEach(btnInfo => {
+                const button = document.createElement('button');
+                button.className = `btn ${btnInfo.class}`;
+                button.innerHTML = btnInfo.text;
+                button.onclick = () => { alert.overlay.classList.remove('show'); resolve(btnInfo.value); };
+                alert.buttons.appendChild(button);
+            });
+            alert.overlay.classList.add('show');
+        });
+    }
+
+    function initializeEventListeners() {
+        UIElements.logoBtn.addEventListener('click', () => navigateTo('home-page'));
+        UIElements.addPostNavLink.addEventListener('click', (e) => { e.preventDefault(); prepareAddForm(); });
+        UIElements.searchInput.addEventListener('input', displayPostList);
+        UIElements.sortSelect.addEventListener('change', (e) => { appState.currentSort = e.target.value; displayPostList(); });
+        UIElements.form.addEventListener('submit', handleFormSubmit);
+        UIElements.postMediaUrl.addEventListener('input', updateMediaPreview);
+        UIElements.postMediaFile.addEventListener('change', updateMediaPreview);
+        UIElements.cancelBtn.addEventListener('click', () => navigateTo('home-page'));
+        UIElements.backToHomeBtn.addEventListener('click', () => navigateTo('home-page'));
+        UIElements.postAuthor.addEventListener('change', (e) => localStorage.setItem('blogAuthorName', e.target.value));
+        
+        UIElements.postListContainer.addEventListener('click', (e) => {
+            const readMoreBtn = e.target.closest('.read-more-btn');
+            if (readMoreBtn) {
+                displaySinglePost(readMoreBtn.dataset.id);
+            }
+        });
+
+        // Import/Export/Theme Listeners
+        UIElements.importBtn.addEventListener('click', async () => {
+             const result = await showConfirmation('Importer des Articles', 'Comment voulez-vous importer les articles ?', [
+                { text: 'Annuler', class: 'btn-secondary', value: 'cancel' },
+                { text: '<i class="fas fa-plus"></i> Fusionner', class: 'btn-success', value: 'merge' },
+                { text: '<i class="fas fa-exclamation-triangle"></i> Écraser', class: 'btn-danger', value: 'overwrite' }
+            ]);
+            if (result === 'merge' || result === 'overwrite') {
+                UIElements.importFileInput.dataset.mode = result;
+                UIElements.importFileInput.click();
+            }
+        });
+
+        UIElements.importFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0]; const mode = e.target.dataset.mode; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result); if (!Array.isArray(data)) throw new Error();
+                    if (mode === 'overwrite') { appState.posts = data; showToast('Données écrasées !', 'success'); } 
+                    else { const ids = new Set(appState.posts.map(p => p.id)); const newPosts = data.filter(p => !ids.has(p.id)); appState.posts.push(...newPosts); showToast(`${newPosts.length} article(s) ajouté(s).`, 'success'); }
+                    saveDataToStorage(); navigateTo('home-page');
+                } catch { showToast('Fichier JSON invalide.', 'error'); }
+            }; reader.readAsText(file); e.target.value = '';
+        });
+
+        UIElements.exportBtn.addEventListener('click', () => {
+            if(appState.posts.length === 0) return showToast('Aucun article à exporter.', 'warning');
+            const dataStr = JSON.stringify(appState.posts, null, 2);
+            const blob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `blog-export-${new Date().toISOString().slice(0,10)}.json`;
+            a.click(); URL.revokeObjectURL(url);
+        });
+
+        UIElements.themeSwitcherBtn.addEventListener('click', () => {
+            appState.currentThemeIndex = (appState.currentThemeIndex + 1) % appState.themes.length;
+            const newTheme = appState.themes[appState.currentThemeIndex];
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('blogTheme', newTheme);
+        });
+    }
+
+    function loadTheme() {
+        const savedTheme = localStorage.getItem('blogTheme') || 'default';
+        const themeIndex = appState.themes.indexOf(savedTheme);
+        appState.currentThemeIndex = themeIndex !== -1 ? themeIndex : 0;
+        document.documentElement.setAttribute('data-theme', appState.themes[appState.currentThemeIndex]);
+    }
+    
+    init();
+});
+</script>
+
+</body>
+</html>

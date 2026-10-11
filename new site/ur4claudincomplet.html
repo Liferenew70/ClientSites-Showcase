@@ -1,0 +1,2096 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Pro - Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
+    
+    <style>
+        :root[data-theme="default"] {
+            --primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-solid: #667eea;
+            --secondary: #764ba2;
+            --bg: #0a0e27;
+            --surface: #151934;
+            --surface-hover: #1e2440;
+            --text: #e4e8f0;
+            --text-muted: #8b96a8;
+            --border: #242b38;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+        }
+        
+        :root[data-theme="ocean"] {
+            --primary: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            --primary-solid: #3b82f6;
+            --secondary: #2563eb;
+            --bg: #0c1425;
+            --surface: #1a2338;
+            --surface-hover: #243049;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #60a5fa;
+        }
+        
+        :root[data-theme="sunset"] {
+            --primary: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            --primary-solid: #f97316;
+            --secondary: #ea580c;
+            --bg: #1c100a;
+            --surface: #2e1c13;
+            --surface-hover: #3d261a;
+            --text: #fde6d8;
+            --text-muted: #d1b8ab;
+            --border: #573d2f;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #fbbf24;
+            --info: #3b82f6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        header {
+            padding: 1.2rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(10, 14, 39, 0.9);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 1.6rem;
+            font-weight: 800;
+            cursor: pointer;
+            background: var(--primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .logo i {
+            background: var(--primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .nav-link, .header-btn {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.7rem 1.4rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            background: none;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+        
+        .nav-link.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .header-btn:hover, .nav-link:hover:not(.active) {
+            background-color: var(--surface-hover);
+            color: var(--primary-solid);
+            transform: translateY(-2px);
+        }
+        
+        .header-btn.active {
+            border-color: var(--success);
+            color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        /* Pages */
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Main */
+        main {
+            min-height: calc(100vh - 200px);
+            padding: 3rem 0;
+        }
+        
+        .page-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            font-size: 2.8rem;
+            font-weight: 900;
+            background: var(--primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Categories Grid */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .category-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary);
+        }
+        
+        .category-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+            border-color: var(--primary-solid);
+        }
+        
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .category-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #fff;
+        }
+        
+        .category-count {
+            background: rgba(102, 126, 234, 0.2);
+            color: var(--primary-solid);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        
+        .category-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .category-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        /* Search & Controls */
+        .controls-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .search-container {
+            position: relative;
+            flex: 1;
+            min-width: 280px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 1rem 3.5rem 1rem 3.5rem;
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            font-size: 1rem;
+            background: var(--surface);
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-solid);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+        
+        .clear-search {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.5rem;
+            display: none;
+        }
+        
+        .clear-search.visible {
+            display: block;
+        }
+        
+        .filter-select {
+            background-color: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+            color: var(--text);
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* Posts Grid */
+        .post-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .post-card {
+            background: var(--surface);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .post-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+        
+        .post-card-media {
+            width: 100%;
+            height: 220px;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .post-card-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .post-card-content {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        
+        .post-card-category {
+            display: inline-block;
+            background: var(--primary);
+            color: #fff;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            width: fit-content;
+        }
+        
+        .post-card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+        
+        .post-card-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+        
+        .post-card-description {
+            flex-grow: 1;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        
+        .post-card-footer {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .post-card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .action-btn {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .action-btn.edit-btn:hover {
+            background: var(--warning);
+            color: #000;
+            border-color: var(--warning);
+        }
+        
+        .action-btn.delete-btn:hover {
+            background: var(--danger);
+            color: #fff;
+            border-color: var(--danger);
+        }
+        
+        /* Form */
+        .form-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--surface);
+            padding: 3rem;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+        }
+        
+        .form-group {
+            margin-bottom: 1.8rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-solid);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+        
+        textarea.form-control {
+            min-height: 180px;
+            resize: vertical;
+        }
+        
+        .form-hint {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.4rem;
+        }
+        
+        /* Category Selector */
+        .category-selector {
+            position: relative;
+        }
+        
+        .category-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            margin-top: 0.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+        
+        .category-dropdown.active {
+            display: block;
+        }
+        
+        .category-option {
+            padding: 1rem 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .category-option:hover {
+            background: var(--surface-hover);
+        }
+        
+        .category-option.create-new {
+            color: var(--primary-solid);
+            font-weight: 700;
+            text-align: center;
+        }
+        
+        /* Image Sources Tabs */
+        .image-sources {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .source-tab {
+            padding: 0.6rem 1.2rem;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .source-tab.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: transparent;
+        }
+        
+        .source-content {
+            display: none;
+        }
+        
+        .source-content.active {
+            display: block;
+        }
+        
+        /* Media Preview */
+        #media-preview {
+            margin-top: 1rem;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid var(--border);
+            min-height: 100px;
+            background: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        #media-preview img {
+            max-width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+        }
+        
+        .crop-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        /* Cropper Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            padding: 2rem;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 2rem;
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+            border: 1px solid var(--border);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        .crop-container {
+            max-width: 800px;
+            max-height: 500px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .crop-container img {
+            max-width: 100%;
+        }
+        
+        /* Single Post */
+        #single-post-media {
+            width: 100%;
+            margin-bottom: 2rem;
+            border-radius: 20px;
+            overflow: hidden;
+            background: var(--bg);
+            position: relative;
+        }
+        
+        #single-post-media.video-container {
+            padding: 4px;
+            background: linear-gradient(45deg, 
+                #667eea 0%, #764ba2 25%, 
+                #f093fb 50%, #4facfe 75%, 
+                #667eea 100%);
+            background-size: 300% 300%;
+            animation: gradientShift 3s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        #single-post-media video {
+            display: block;
+            width: 100%;
+            border-radius: 16px;
+        }
+        
+        #single-post-media img {
+            width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+        }
+        
+        .article-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        #single-post-title {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+        
+        .single-post-meta {
+            display: flex;
+            gap: 2rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        #single-post-description {
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+        
+        #single-post-description h1,
+        #single-post-description h2,
+        #single-post-description h3 {
+            margin: 2rem 0 1rem;
+            color: var(--text);
+        }
+        
+        #single-post-description p {
+            margin-bottom: 1rem;
+        }
+        
+        #single-post-description a {
+            color: var(--primary-solid);
+            text-decoration: underline;
+        }
+        
+        #single-post-description code {
+            background: var(--surface);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        #single-post-description pre {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 12px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+        
+        .single-post-cta {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.9rem 2rem;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 14, 39, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            flex-direction: column;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary-solid);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            margin-top: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .progress-bar-container {
+            width: 300px;
+            height: 4px;
+            background: var(--surface);
+            border-radius: 4px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--surface);
+            color: var(--text);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            opacity: 0;
+            transform: translateY(100px);
+            transition: all 0.5s ease;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        .toast.warning { border-left: 4px solid var(--warning); }
+        .toast.info { border-left: 4px solid var(--info); }
+        
+        /* Alert */
+        .custom-alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9998;
+        }
+        
+        .custom-alert-overlay.show {
+            display: flex;
+        }
+        
+        .custom-alert-box {
+            background: var(--surface);
+            padding: 2.5rem;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            border: 1px solid var(--border);
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        #custom-alert-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        #custom-alert-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        /* Footer */
+        footer {
+            padding: 3rem 0;
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-muted);
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            list-style: none;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary-solid);
+            transform: scale(1.1);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .categories-grid,
+            .post-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                justify-content: center;
+            }
+            
+            .controls-container {
+                flex-direction: column;
+            }
+            
+            .search-container {
+                width: 100%;
+            }
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <div class="header-content">
+            <div class="logo" id="logo-btn">
+                <i class="fas fa-blog"></i>
+                <span>Blog Pro</span>
+            </div>
+            <div class="header-actions">
+                <a href="#" class="nav-link" id="home-nav-link">
+                    <i class="fas fa-home"></i> Accueil
+                </a>
+                <a href="#" class="nav-link" id="add-post-nav-link">
+                    <i class="fas fa-plus-circle"></i> Ajouter
+                </a>
+                <button class="header-btn" id="select-folder-btn" title="Sélectionner le dossier de travail">
+                    <i class="fas fa-folder-open"></i> Dossier
+                </button>
+                <button class="header-btn" id="import-btn">
+                    <i class="fas fa-file-import"></i> Importer
+                </button>
+                <button class="header-btn" id="export-btn">
+                    <i class="fas fa-file-export"></i> Exporter
+                </button>
+                <button class="header-btn" id="theme-switcher-btn" title="Changer de thème">
+                    <i class="fas fa-palette"></i>
+                </button>
+                <button class="header-btn" id="reset-all-btn" title="Tout supprimer">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <!-- HOME PAGE -->
+    <section id="home-page" class="page">
+        <div class="container">
+            <h2 class="page-title">
+                <i class="fas fa-layer-group"></i> Mes Catégories
+            </h2>
+            
+            <div class="controls-container">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="home-search-input" class="search-input" placeholder="Rechercher dans toutes les catégories...">
+                    <button class="clear-search" id="home-clear-search">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="categories-container" class="categories-grid"></div>
+        </div>
+    </section>
+
+    <!-- CATEGORY VIEW PAGE -->
+    <section id="category-view-page" class="page">
+        <div class="container">
+            <button id="back-to-categories-btn" class="btn btn-secondary" style="margin-bottom: 2rem;">
+                <i class="fas fa-arrow-left"></i> Retour aux catégories
+            </button>
+            
+            <h2 class="page-title" id="category-view-title"></h2>
+            
+            <div class="controls-container">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="category-search-input" class="search-input" placeholder="Rechercher dans cette catégorie...">
+                    <button class="clear-search" id="category-clear-search">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <select id="sort-select" class="filter-select">
+                    <option value="date-desc">Plus récent</option>
+                    <option value="date-asc">Plus ancien</option>
+                    <option value="title-asc">Titre (A-Z)</option>
+                    <option value="title-desc">Titre (Z-A)</option>
+                </select>
+            </div>
+            
+            <div id="category-post-list" class="post-list"></div>
+        </div>
+    </section>
+
+    <!-- ADD/EDIT PAGE -->
+    <section id="add-edit-page" class="page">
+        <div class="container">
+            <h2 class="page-title">
+                <i class="fas fa-pencil-alt"></i>
+                <span id="form-title">Ajouter un Article</span>
+            </h2>
+            
+            <div class="form-container">
+                <form id="post-form">
+                    <input type="hidden" id="post-id">
+                    
+                    <div class="form-group">
+                        <label for="post-title">Titre *</label>
+                        <input type="text" id="post-title" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="post-category-input">Catégorie *</label>
+                        <div class="category-selector">
+                            <input type="text" id="post-category-input" class="form-control" placeholder="Sélectionner ou créer une catégorie" required readonly>
+                            <div id="category-dropdown" class="category-dropdown"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="post-main-file">Fichier principal</label>
+                        <input type="file" id="post-main-file" class="form-control">
+                        <small class="form-hint">Ce fichier doit se trouver dans votre dossier de travail.</small>
+                    </div>
+                    
+                    <div class="form-group" id="thumbnail-group">
+                        <label>Image de prévisualisation</label>
+                        
+                        <div class="image-sources">
+                            <button type="button" class="source-tab active" data-source="local">
+                                <i class="fas fa-laptop"></i> Local
+                            </button>
+                            <button type="button" class="source-tab" data-source="external">
+                                <i class="fas fa-link"></i> Lien externe
+                            </button>
+                        </div>
+                        
+                        <div class="source-content active" id="local-source">
+                            <input type="file" id="post-thumbnail-file" class="form-control" accept="image/*">
+                            <small class="form-hint">Choisir une image depuis votre dossier de travail</small>
+                        </div>
+                        
+                        <div class="source-content" id="external-source">
+                            <input type="url" id="post-thumbnail-url" class="form-control" placeholder="https://example.com/image.jpg ou data:image/...">
+                            <small class="form-hint">URL ou data URI d'une image externe</small>
+                        </div>
+                        
+                        <div id="media-preview"></div>
+                        
+                        <div class="crop-controls" id="crop-controls" style="display: none;">
+                            <button type="button" class="btn btn-sm btn-primary" id="open-crop-btn">
+                                <i class="fas fa-crop"></i> Recadrer l'image
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="post-description">Description</label>
+                        <textarea id="post-description" class="form-control" placeholder="Utilisez Markdown pour formater votre texte...&#10;&#10;# Titre&#10;**Gras** *Italique*&#10;&#10;Utilisez <retourLine> pour forcer un retour à la ligne"></textarea>
+                        <small class="form-hint">Markdown supporté. Utilisez &lt;retourLine&gt; pour un retour à la ligne</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="post-telegram-file">Lien Telegram vers le fichier (facultatif)</label>
+                        <input type="url" id="post-telegram-file" class="form-control" placeholder="https://t.me/...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="post-telegram">Lien Canal Telegram (facultatif)</label>
+                        <input type="url" id="post-telegram" class="form-control" placeholder="https://t.me/...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="post-author">Auteur *</label>
+                        <input type="text" id="post-author" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" id="cancel-btn" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Annuler
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> <span id="save-btn-text">Publier</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- SINGLE POST PAGE -->
+    <section id="single-post-page" class="page">
+        <div class="container">
+            <button id="back-to-category-btn" class="btn btn-secondary" style="margin-bottom: 2rem;">
+                <i class="fas fa-arrow-left"></i> Retour
+            </button>
+            
+            <article class="article-content">
+                <div id="single-post-media"></div>
+                
+                <h1 id="single-post-title"></h1>
+                
+                <div class="single-post-meta">
+                    <span id="single-post-category"></span>
+                    <span id="single-post-author"></span>
+                    <span id="single-post-date"></span>
+                </div>
+                
+                <div id="single-post-description"></div>
+                
+                <div class="single-post-cta" id="single-post-cta"></div>
+            </article>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="container">
+        <ul class="footer-links">
+            <li>
+                <a href="mailto:es2iprompter@gmail.com">
+                    <i class="fas fa-envelope"></i> Email
+                </a>
+            </li>
+            <li>
+                <a href="https://wa.me/2250719030672" target="_blank" rel="noopener">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+            </li>
+            <li>
+                <a href="https://jadpot.com" target="_blank" rel="noopener">
+                    <i class="fas fa-briefcase"></i> Portfolio
+                </a>
+            </li>
+        </ul>
+        <p>&copy; 2025 Blog Pro. Tous droits réservés.</p>
+    </div>
+</footer>
+
+<!-- CROPPER MODAL -->
+<div id="crop-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Recadrer l'image</h3>
+            <button class="close-modal" id="close-crop-modal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="crop-container">
+            <img id="crop-image" src="">
+        </div>
+        
+        <div class="crop-controls">
+            <button type="button" class="btn btn-sm btn-secondary" id="crop-zoom-in">
+                <i class="fas fa-search-plus"></i> Zoom +
+            </button>
+            <button type="button" class="btn btn-sm btn-secondary" id="crop-zoom-out">
+                <i class="fas fa-search-minus"></i> Zoom -
+            </button>
+            <button type="button" class="btn btn-sm btn-secondary" id="crop-rotate-left">
+                <i class="fas fa-undo"></i> Rotation ←
+            </button>
+            <button type="button" class="btn btn-sm btn-secondary" id="crop-rotate-right">
+                <i class="fas fa-redo"></i> Rotation →
+            </button>
+            <button type="button" class="btn btn-sm btn-secondary" id="crop-flip-h">
+                <i class="fas fa-arrows-alt-h"></i> Flip H
+            </button>
+            <button type="button" class="btn btn-sm btn-secondary" id="crop-flip-v">
+                <i class="fas fa-arrows-alt-v"></i> Flip V
+            </button>
+            <button type="button" class="btn btn-sm btn-secondary" id="crop-reset">
+                <i class="fas fa-sync"></i> Réinitialiser
+            </button>
+        </div>
+        
+        <div class="crop-controls" style="margin-top: 1rem;">
+            <button type="button" class="btn btn-sm btn-secondary" data-ratio="free">Libre</button>
+            <button type="button" class="btn btn-sm btn-secondary" data-ratio="1">1:1</button>
+            <button type="button" class="btn btn-sm btn-secondary" data-ratio="1.333">4:3</button>
+            <button type="button" class="btn btn-sm btn-secondary" data-ratio="1.777">16:9</button>
+        </div>
+        
+        <div style="margin-top: 1.5rem; text-align: center;">
+            <button type="button" class="btn btn-secondary" id="cancel-crop-btn">
+                <i class="fas fa-times"></i> Annuler
+            </button>
+            <button type="button" class="btn btn-primary" id="apply-crop-btn">
+                <i class="fas fa-check"></i> Appliquer
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div id="loading-overlay" class="loading-overlay">
+    <div class="loader"></div>
+    <div class="loading-text" id="loading-text">Chargement...</div>
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<!-- ALERT -->
+<div id="custom-alert-overlay" class="custom-alert-overlay">
+    <div class="custom-alert-box">
+        <h3 id="custom-alert-title"></h3>
+        <p id="custom-alert-message"></p>
+        <div id="custom-alert-buttons"></div>
+    </div>
+</div>
+
+<input type="file" id="import-file-input" accept=".json" style="display: none;">
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    // ==========================================
+    // VÉRIFICATION COMPATIBILITÉ NAVIGATEUR
+    // ==========================================
+    if (!window.showDirectoryPicker) {
+        document.body.innerHTML = `
+            <div style="text-align: center; padding: 50px; font-size: 1.2rem;">
+                <h1>⚠️ Navigateur non compatible</h1>
+                <p>Cette application nécessite Chrome ou Edge (version 86+) pour fonctionner.</p>
+                <p>La File System Access API n'est pas disponible dans votre navigateur.</p>
+            </div>`;
+        return;
+    }
+
+    // ==========================================
+    // STATE MANAGEMENT
+    // ==========================================
+    const appState = {
+        posts: [],
+        categories: [],
+        fileIndex: {},
+        folderHandle: null,
+        currentCategory: null,
+        currentThemeIndex: 0,
+        themes: ['default', 'ocean', 'sunset'],
+        currentSort: 'date-desc',
+        croppedImageBlob: null,
+        currentEditingPostId: null,
+        currentVideoElement: null
+    };
+
+    // ==========================================
+    // UI ELEMENTS
+    // ==========================================
+    const UI = {
+        pages: document.querySelectorAll('.page'),
+        logoBtn: document.getElementById('logo-btn'),
+        homeNavLink: document.getElementById('home-nav-link'),
+        addPostNavLink: document.getElementById('add-post-nav-link'),
+        
+        // Home page
+        homeSearchInput: document.getElementById('home-search-input'),
+        homeClearSearch: document.getElementById('home-clear-search'),
+        categoriesContainer: document.getElementById('categories-container'),
+        
+        // Category view
+        categoryViewPage: document.getElementById('category-view-page'),
+        categoryViewTitle: document.getElementById('category-view-title'),
+        categorySearchInput: document.getElementById('category-search-input'),
+        categoryClearSearch: document.getElementById('category-clear-search'),
+        categoryPostList: document.getElementById('category-post-list'),
+        backToCategoriesBtn: document.getElementById('back-to-categories-btn'),
+        sortSelect: document.getElementById('sort-select'),
+        
+        // Form
+        form: document.getElementById('post-form'),
+        formTitle: document.getElementById('form-title'),
+        postId: document.getElementById('post-id'),
+        postTitle: document.getElementById('post-title'),
+        postCategoryInput: document.getElementById('post-category-input'),
+        categoryDropdown: document.getElementById('category-dropdown'),
+        postMainFile: document.getElementById('post-main-file'),
+        postThumbnailFile: document.getElementById('post-thumbnail-file'),
+        postThumbnailUrl: document.getElementById('post-thumbnail-url'),
+        mediaPreview: document.getElementById('media-preview'),
+        cropControls: document.getElementById('crop-controls'),
+        openCropBtn: document.getElementById('open-crop-btn'),
+        postDescription: document.getElementById('post-description'),
+        postTelegramFile: document.getElementById('post-telegram-file'),
+        postTelegram: document.getElementById('post-telegram'),
+        postAuthor: document.getElementById('post-author'),
+        saveBtnText: document.getElementById('save-btn-text'),
+        cancelBtn: document.getElementById('cancel-btn'),
+        
+        // Image source tabs
+        sourceTabs: document.querySelectorAll('.source-tab'),
+        sourceContents: document.querySelectorAll('.source-content'),
+        
+        // Single post
+        singlePostPage: document.getElementById('single-post-page'),
+        singlePostMedia: document.getElementById('single-post-media'),
+        singlePostTitle: document.getElementById('single-post-title'),
+        singlePostCategory: document.getElementById('single-post-category'),
+        singlePostAuthor: document.getElementById('single-post-author'),
+        singlePostDate: document.getElementById('single-post-date'),
+        singlePostDescription: document.getElementById('single-post-description'),
+        singlePostCta: document.getElementById('single-post-cta'),
+        backToCategoryBtn: document.getElementById('back-to-category-btn'),
+        
+        // Header buttons
+        selectFolderBtn: document.getElementById('select-folder-btn'),
+        importBtn: document.getElementById('import-btn'),
+        exportBtn: document.getElementById('export-btn'),
+        importFileInput: document.getElementById('import-file-input'),
+        themeSwitcherBtn: document.getElementById('theme-switcher-btn'),
+        resetAllBtn: document.getElementById('reset-all-btn'),
+        
+        // Cropper modal
+        cropModal: document.getElementById('crop-modal'),
+        cropImage: document.getElementById('crop-image'),
+        closeCropModal: document.getElementById('close-crop-modal'),
+        cropZoomIn: document.getElementById('crop-zoom-in'),
+        cropZoomOut: document.getElementById('crop-zoom-out'),
+        cropRotateLeft: document.getElementById('crop-rotate-left'),
+        cropRotateRight: document.getElementById('crop-rotate-right'),
+        cropFlipH: document.getElementById('crop-flip-h'),
+        cropFlipV: document.getElementById('crop-flip-v'),
+        cropReset: document.getElementById('crop-reset'),
+        cancelCropBtn: document.getElementById('cancel-crop-btn'),
+        applyCropBtn: document.getElementById('apply-crop-btn'),
+        
+        // Loading & notifications
+        loadingOverlay: document.getElementById('loading-overlay'),
+        loadingText: document.getElementById('loading-text'),
+        progressBar: document.getElementById('progress-bar'),
+        toast: document.getElementById('toast'),
+        alertOverlay: document.getElementById('custom-alert-overlay'),
+        alertTitle: document.getElementById('custom-alert-title'),
+        alertMessage: document.getElementById('custom-alert-message'),
+        alertButtons: document.getElementById('custom-alert-buttons')
+    };
+
+    let db;
+    let cropperInstance = null;
+
+    // ==========================================
+    // INDEXEDDB - GESTION DES HANDLES
+    // ==========================================
+    function initDB(callback) {
+        const request = indexedDB.open('BlogProDB', 2);
+        
+        request.onerror = () => {
+            console.error('Erreur ouverture base de données');
+            callback();
+        };
+        
+        request.onupgradeneeded = (e) => {
+            const database = e.target.result;
+            if (!database.objectStoreNames.contains('handles')) {
+                database.createObjectStore('handles', { keyPath: 'id' });
+            }
+        };
+        
+        request.onsuccess = (e) => {
+            db = e.target.result;
+            callback();
+        };
+    }
+
+    async function saveHandle(id, handle) {
+        return new Promise((resolve, reject) => {
+            if (!db) return reject(new Error('DB non initialisée'));
+            const tx = db.transaction('handles', 'readwrite');
+            tx.objectStore('handles').put({ id, handle });
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+        });
+    }
+
+    async function getHandle(id) {
+        return new Promise((resolve) => {
+            if (!db) return resolve(null);
+            const request = db.transaction('handles').objectStore('handles').get(id);
+            request.onsuccess = (e) => resolve(e.target.result?.handle || null);
+            request.onerror = () => resolve(null);
+        });
+    }
+
+    // ==========================================
+    // FILE SYSTEM - SCAN RÉCURSIF
+    // ==========================================
+    async function verifyFolderPermission(handle) {
+        if (!handle) return false;
+        const options = { mode: 'readwrite' };
+        if ((await handle.queryPermission(options)) === 'granted') return true;
+        if ((await handle.requestPermission(options)) === 'granted') return true;
+        return false;
+    }
+
+    async function scanFolderRecursively(dirHandle, basePath = '', progress = { current: 0, total: 0 }) {
+        const files = {};
+        
+        try {
+            const entries = [];
+            for await (const entry of dirHandle.values()) {
+                entries.push(entry);
+            }
+            
+            progress.total += entries.length;
+            
+            for (const entry of entries) {
+                progress.current++;
+                updateProgress(progress.current, progress.total);
+                
+                const fullPath = basePath ? `${basePath}/${entry.name}` : entry.name;
+                
+                if (entry.kind === 'file') {
+                    files[fullPath] = entry;
+                } else if (entry.kind === 'directory') {
+                    const subFiles = await scanFolderRecursively(entry, fullPath, progress);
+                    Object.assign(files, subFiles);
+                }
+            }
+        } catch (error) {
+            console.error('Erreur scan dossier:', error);
+        }
+        
+        return files;
+    }
+
+    async function selectWorkingFolder() {
+        try {
+            const handle = await window.showDirectoryPicker({
+                mode: 'readwrite'
+            });
+            
+            if (await verifyFolderPermission(handle)) {
+                appState.folderHandle = handle;
+                await saveHandle('workingFolder', handle);
+                UI.selectFolderBtn.classList.add('active');
+                showToast('Dossier sélectionné avec succès', 'success');
+                await indexFolder();
+            } else {
+                showToast('Permission refusée', 'error');
+            }
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                console.error('Erreur sélection dossier:', error);
+                showToast('Erreur lors de la sélection', 'error');
+            }
+        }
+    }
+
+    async function indexFolder() {
+        if (!appState.folderHandle) {
+            showToast('Veuillez d\'abord sélectionner un dossier', 'warning');
+            return;
+        }
+
+        showLoading('Indexation des fichiers en cours...', true);
+        
+        try {
+            const startTime = Date.now();
+            const progress = { current: 0, total: 0 };
+            appState.fileIndex = await scanFolderRecursively(appState.folderHandle, '', progress);
+            
+            const fileCount = Object.keys(appState.fileIndex).length;
+            const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+            
+            hideLoading();
+            showToast(`${fileCount} fichier(s) indexé(s) en ${duration}s`, 'success');
+            
+            return fileCount;
+        } catch (error) {
+            hideLoading();
+            console.error('Erreur indexation:', error);
+            showToast('Erreur lors de l\'indexation', 'error');
+            return 0;
+        }
+    }
+
+    async function getFileFromIndex(fileName) {
+        if (!fileName || !appState.fileIndex[fileName]) return null;
+        
+        try {
+            const fileHandle = appState.fileIndex[fileName];
+            return await fileHandle.getFile();
+        } catch (error) {
+            console.warn(`Fichier introuvable: ${fileName}`);
+            return null;
+        }
+    }
+
+    function updateProgress(current, total) {
+        const percent = total > 0 ? Math.round((current / total) * 100) : 0;
+        UI.progressBar.style.width = `${percent}%`;
+        UI.loadingText.textContent = `Indexation: ${current}/${total} fichiers (${percent}%)`;
+    }
+
+    // ==========================================
+    // STORAGE - LOCALSTORAGE
+    // ==========================================
+    function loadDataFromStorage() {
+        try {
+            const postsData = localStorage.getItem('blogProPosts');
+            const categoriesData = localStorage.getItem('blogProCategories');
+            const themeData = localStorage.getItem('blogProTheme');
+            
+            appState.posts = postsData ? JSON.parse(postsData) : [];
+            appState.categories = categoriesData ? JSON.parse(categoriesData) : [];
+            
+            if (themeData) {
+                appState.currentThemeIndex = parseInt(themeData);
+                applyTheme(appState.themes[appState.currentThemeIndex]);
+            }
+        } catch (error) {
+            console.error('Erreur chargement données:', error);
+            appState.posts = [];
+            appState.categories = [];
+        }
+    }
+
+    function saveDataToStorage() {
+        try {
+            localStorage.setItem('blogProPosts', JSON.stringify(appState.posts));
+            localStorage.setItem('blogProCategories', JSON.stringify(appState.categories));
+            localStorage.setItem('blogProTheme', appState.currentThemeIndex.toString());
+        } catch (error) {
+            console.error('Erreur sauvegarde données:', error);
+            showToast('Erreur lors de la sauvegarde', 'error');
+        }
+    }
+
+    // ==========================================
+    // NAVIGATION
+    // ==========================================
+    function navigateTo(pageId) {
+        // Cleanup vidéo si elle existe
+        if (appState.currentVideoElement) {
+            appState.currentVideoElement.pause();
+            appState.currentVideoElement = null;
+        }
+
+        UI.pages.forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        
+        UI.homeNavLink.classList.toggle('active', pageId === 'home-page');
+        UI.addPostNavLink.classList.toggle('active', pageId === 'add-edit-page');
+        
+        if (pageId === 'home-page') {
+            displayCategories();
+        }
+    }
+
+    // ==========================================
+    // UTILITAIRES
+    // ==========================================
+    function normalizeString(str) {
+        return str.toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function generateId() {
+        return 'post-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    }
+
+    function formatDate(date) {
+        return new Date(date).toLocaleString('fr-FR', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    function getFileExtension(filename) {
+        return filename.split('.').pop().toLowerCase();
+    }
+
+    function isVideoFile(filename) {
+        const videoExts = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
+        return videoExts.includes(getFileExtension(filename));
+    }
+
+    function isImageFile(filename) {
+        const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'];
+        return imageExts.includes(getFileExtension(filename));
+    }
+
+    // ==========================================
+    // UI - LOADING & TOASTS
+    // ==========================================
+    function showLoading(message = 'Chargement...', showProgress = false) {
+        UI.loadingText.textContent = message;
+        UI.loadingOverlay.classList.add('active');
+        if (showProgress) {
+            UI.progressBar.style.width = '0%';
+        }
+    }
+
+    function hideLoading() {
+        UI.loadingOverlay.classList.remove('active');
+        UI.progressBar.style.width = '0%';
+    }
+
+    function showToast(message, type = 'info') {
+        UI.toast.textContent = message;
+        UI.toast.className = `toast ${type} show`;
+        
+        setTimeout(() => {
+            UI.toast.classList.remove('show');
+        }, 3000);
+    }
+
+    function showAlert(title, message, buttons = []) {
+        UI.alertTitle.textContent = title;
+        UI.alertMessage.textContent = message;
+        UI.alertButtons.innerHTML = '';
+        
+        buttons.forEach(btn => {
+            const button = document.createElement('button');
+            button.className = `btn ${btn.class || 'btn-secondary'}`;
+            button.innerHTML = `<i class="${btn.icon || 'fas fa-check'}"></i> ${btn.text}`;
+            button.onclick = () => {
+                UI.alertOverlay.classList.remove('show');
+                if (btn.onClick) btn.onClick();
+            };
+            UI.alertButtons.appendChild(button);
+        });
+        
+        UI.alertOverlay.classList.add('show');
+    }
+
+    // ==========================================
+    // CATÉGORIES
+    // ==========================================
+    function getOrCreateCategory(categoryName) {
+        let category = appState.categories.find(c => c.name === categoryName);
+        
+        if (!category) {
+            category = {
+                name: categoryName,
+                icon: 'fas fa-folder',
+                createdAt: new Date().toISOString()
+            };
+            appState.categories.push(category);
+            saveDataToStorage();
+        }
+        
+        return category;
+    }
+
+    function getPostsByCategory(categoryName) {
+        return appState.posts.filter(post => post.category === categoryName);
+    }
+
+    function displayCategories() {
+        UI.categoriesContainer.innerHTML = '';
+        
+        const searchTerm = normalizeString(UI.homeSearchInput.value);
+        let filteredCategories = appState.categories.filter(cat => {
+            if (normalizeString(cat.name).includes(searchTerm)) return true;
+            
+            const posts = getPostsByCategory(cat.name);
+            return posts.some(post => 
+                normalizeString(post.title).includes(searchTerm) ||
+                normalizeString(post.description || '').includes(searchTerm) ||
+                normalizeString(post.author || '').includes(searchTerm)
+            );
+        });
+
+        UI.homeClearSearch.classList.toggle('visible', searchTerm.length > 0);
+
+        if (filteredCategories.length === 0) {
+            UI.categoriesContainer.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <i class="fas fa-folder-open"></i>
+                    <p>${searchTerm ? 'Aucune catégorie trouvée' : 'Aucune catégorie. Créez votre première en ajoutant un article !'}</p>
+                </div>
+            `;
+            return;
+        }
+
+        filteredCategories.forEach(category => {
+            const posts = getPostsByCategory(category.name);
+            const card = document.createElement('div');
+            card.className = 'category-card';
+            
+            card.innerHTML = `
+                <div class="category-header">
+                    <div class="category-icon">
+                        <i class="${category.icon}"></i>
+                    </div>
+                    <span class="category-count">${posts.length}</span>
+                </div>
+                <h3 class="category-name">${category.name}</h3>
+                <p class="category-description">${posts.length} article(s)</p>
+            `;
+            
+            card.addEventListener('click', () => viewCategory(category.name));
+            UI.categoriesContainer.appendChild(card);
+        });
+    }
+
+    function viewCategory(categoryName) {
+        appState.currentCategory = categoryName;
+        UI.categoryViewTitle.innerHTML = `<i class="fas fa-folder-open"></i> ${categoryName}`;
+        UI.categorySearchInput.value = '';
+        UI.categoryClearSearch.classList.remove('visible');
+        navigateTo('category-view-page');
+        displayCategoryPosts();
+    }
+
+    // ==========================================
+    // POSTS - AFFICHAGE
+    // ==========================================
+    async function displayCategoryPosts() {
+        UI.categoryPostList.innerHTML = '';
+        
+        const searchTerm = normalizeString(UI.categorySearchInput.value);
+        let posts = getPostsByCategory(appState.currentCategory);
+        
+        if (searchTerm) {
+            posts = posts.filter(p => 
+                normalizeString(p.title).includes(searchTerm) ||
+                normalizeString(p.author || '').includes(searchTerm) ||
+                normalizeString(p.description || '').includes(searchTerm)
+            );
+        }
+        
+        // Tri des posts
+        posts.sort((a, b) => {
+            const dateA = new Date(a.createdAt);
+            const dateB = new Date(b.createdAt);
+            const titleA = a.title.toLowerCase();
+            const titleB = b.title.toLowerCase();
+            
+            switch(appState.currentSort) {
+                case 'date-asc': return dateA - dateB;
+                case 'title-asc': return titleA.localeCompare(titleB);
+                case 'title-desc': return titleB.localeCompare(titleA);
+                default: return dateB - dateA; // date-desc
+            }
+        });
+
+        UI.categoryClearSearch.classList.toggle('visible', searchTerm.length > 0);
+
+        if (posts.length === 0) {
+            UI.categoryPostList.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <i class="fas fa-newspaper"></i>
+                    <p>${searchTerm ? 'Aucun article trouvé' : 'Aucun article dans cette catégorie'}</p>
+                </div>
+            `;
+            return;
+        }
+
+        for (const post of posts) {
+            const card = await createPostCard(post);
+            UI.categoryPostList.appendChild(card);
+        }
+    }
+
+    async function createPostCard(post) {
+        const card = document.createElement('div');
+        card.className = 'post-card';
+        
+        // Déterminer la source de la vignette
+        let thumbnailSrc = null;
+        if (post.thumbCropped) {
+            thumbnailSrc = post.thumbCropped;
+        } else if (post.thumbExternal) {
+            thumbnailSrc = post.thumbExternal;
+        } else if (post.thumbName) {
+            const thumbFile = await getFileFromIndex(post.thumbName);
+            if (thumbFile) {
+                thumbnailSrc = URL.createObjectURL(thumbFile);
+            }
+        }
+
+        const mediaHTML = thumbnailSrc 
+            ? `<img src="${thumbnailSrc}" alt="${post.title}">`
+            : `<i class="fas fa-image" style="font-size: 3rem; color: var(--text-muted);"></i>`;
+
+        // Extraction début description
+        const descText = post.description ? post.description.substring(0, 150) + '...' : '';
+
+        card.innerHTML = `
+            <div class="post-card-media">
+                ${mediaHTML}
+            </div>
+            <div class="post-card-content">
+                <span class="post-card-category">${post.category}</span>
+                <h3 class="post-card-title">${post.title}</h3>
+                <div class="post-card-meta">
+                    <span><i class="fas fa-user"></i> ${post.author}</span>
+                    <span><i class="fas fa-calendar"></i> ${formatDate(post.createdAt)}</span>
+                </div>
+                <p class="post-card-description">${descText}</p>
+                <div class="post-card-footer">
+                    <button class="btn btn-sm btn-primary view-post-btn">
+                        <i class="fas fa-eye"></i> Voir plus
+                    </button>
+                    <div class="post-card-actions">
+                        <button class="action-btn edit-btn" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" title="Supprimer">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Event listeners
+        card.querySelector('.view-post-btn').addEventListener('click', () => viewPost(post.id));
+        card.querySelector('.edit-btn').addEventListener('click', () => editPost(post.id));
+        card.querySelector('.delete-btn').addEventListener('click', () => deletePost(post.id));
+
+        return card;
+    }
+
+    async function viewPost(postId) {
+        const post = appState.posts.find(p => p.id === postId);
+        if (!post) return;
+
+        navigateTo('single-post-page');
+
+        // Media
+        UI.singlePostMedia.innerHTML = '';
+        if (post.fileName) {
+            const file = await getFileFromIndex(post.fileName);
+            if (file) {
+                if (isVideoFile(post.fileName)) {
+                    UI.singlePostMedia.classList.add('video-container');
+                    const video = document.createElement('video');
+                    video.controls = true;
+                    video.src = URL.createObjectURL(file);
+                    video.style.width = '100%';
+                    UI.singlePostMedia.appendChild(video);
+                    appState.currentVideoElement = video;
+                    setupVideoControls(video);
+                } else if (isImageFile(post.fileName)) {
+                    UI.singlePostMedia.classList.remove('video-container');
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    UI.singlePostMedia.appendChild(img);
+                }
+            }
+        }
+
+        // Infos
+        UI.singlePostTitle.textContent = post.title;
+        UI.singlePostCategory.innerHTML = `<i class="fas fa-folder"></i> ${post.category}`;
+        UI.singlePostAuthor.innerHTML = `<i class="fas fa-user"></i> ${post.author}`;
+        UI.singlePostDate.innerHTML = `<i class="fas fa-calendar"></i> ${formatDate(post.createdAt)}`;
+
+        // Description avec Markdown et <retourLine>
+        let descriptionHTML = post.description || '';
+        descriptionHTML = descriptionHTML.replace(/<retourLine>/g, '<br>');
+        try {
+            descriptionHTML = marked.parse(descriptionHTML);
+        } catch (error) {
+            console.error('Erreur Markdown:', error);
+        }
+        UI.singlePostDescription.innerHTML = descriptionHTML;
+
+        // CTA Buttons
+        UI.singlePostCta.innerHTML = '';
+        if (post.telegramFileUrl) {
+            const btnFile = document.createElement('a');
+            btnFile.href = post.telegramFileUrl;
+            btnFile.target = '_blank';
+            btnFile.className = 'btn btn-primary';
+            btnFile.innerHTML = '<i class="fab fa-telegram"></i> Télécharger le fichier';
+            UI.singlePostCta.appendChild(btnFile);
+        }
+        if (post.telegramUrl) {
+            const btnChannel = document.createElement('a');
+            btnChannel.href = post.telegramUrl;
+            btnChannel.target = '_blank';
+            btnChannel.className = 'btn btn-secondary';
+            btnChannel.innerHTML = '<i class="fab fa-telegram"></i> Rejoindre le canal';
+            UI.singlePostCta.appendChild(btnChannel);
+        }
+    }
+
+    function setupVideoControls(video) {
+        const handler = (e) => {
+            switch(e.key) {
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    video.currentTime = Math.max(0, video.currentTime - 5);
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    video.currentTime = Math.min(video.duration, video.currentTime + 5);
+                    break;
+                case ' ':
+                    e.preventDefault();
+                    video.paused ? video.play() : video.pause();
+                    break;
+                case 'f':
+                case 'F':
+                    e.preventDefault();
+                    if (video.requestFullscreen) video.requestFullscreen();
+                    break;
+            }
+        };
+        
+        document.addEventListener('keydown', handler);
+        video.addEventListener('pause', () => {
+            document.removeEventListener('keydown', handler);
+        }, { once: true });
+    }
+
+    // ==========================================
+    // POSTS - CRUD
+    // ==========================================
+    function editPost(postId) {
+        const post = appState.posts.find(p => p.id === postId);
+        if (!post) return;
+
+        appState.currentEditingPostId = postId;
+        UI.formTitle.innerHTML = '<i class="fas fa-edit"></i> Modifier l\'Article';
+        UI.saveBtnText.textContent = 'Mettre à jour';
+
+        UI.postId.value = post.id;
+        UI.postTitle.value = post.title;
+        UI.postCategoryInput.value = post.category;
+        UI.postDescription.value = post.description || '';
+        UI.postTelegramFile.value = post.telegramFileUrl || '';
+        UI.postTelegram.value = post.telegramUrl || '';
+        UI.postAuthor.value = post.author;
+
+        // Preview thumbnail si existe
+        if (post.thumbCropped) {
+            displayImagePreview(post.thumbCropped);
+        } else if (post.thumbExternal) {
+            UI.postThumbnailUrl.value = post.thumbExternal;
+            displayImagePreview(post.thumbExternal);
+        }
+
+        navigateTo('add-edit-page');
+    }
+
+    async function deletePost(postId) {
+        const post = appState.posts.find(p => p.id === postId);
+        if (!post) return;
+
+        showAlert(
+            'Confirmer la suppression',
+            `Êtes-vous sûr de vouloir supprimer "${post.title}" ?`,
+            [
+                {
+                    text: 'Annuler',
+                    class: 'btn-secondary',
+                    icon: 'fas fa-times'
+                },
+                {
+                    text: 'Supprimer',
+                    class: 'btn-danger',
+                    icon: 'fas fa-trash',
+                    onClick: () => {
+                        appState.posts = appState.posts.filter(p => p.id !== postId);
+                        saveDataToStorage();
+                        showToast('Article supprimé', 'success');
+                        displayCategoryPosts();
+                    }
+                }
+            ]
+        );
+    }
+});
+</script>
+</body>
+</html>

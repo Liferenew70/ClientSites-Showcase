@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Blog Admin Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- ================================ CSS INTÉGRÉ ================================= -->
+    <style>
+        :root[data-theme="default"] { --primary-color: #34d399; --secondary-color: #10b981; --background-color: #0a0e14; --surface-color: #151922; --text-color: #e4e8f0; --text-muted-color: #8b96a8; --border-color: #242b38; }
+        :root[data-theme="ocean"] { --primary-color: #3b82f6; --secondary-color: #2563eb; --background-color: #0c1425; --surface-color: #1a2338; --text-color: #e2e8f0; --text-muted-color: #94a3b8; --border-color: #334155; }
+        :root[data-theme="sunset"] { --primary-color: #f97316; --secondary-color: #ea580c; --background-color: #1c100a; --surface-color: #2e1c13; --text-color: #fde6d8; --text-muted-color: #d1b8ab; --border-color: #573d2f; }
+        :root { --header-background: rgba(10, 14, 20, 0.85); --success-color: #10b981; --danger-color: #ef4444; --warning-color: #f59e0b; --font-family: 'Inter', 'Segoe UI', sans-serif; --border-radius: 16px; --border-radius-sm: 12px; --box-shadow: 0 8px 32px rgba(0,0,0,0.4); --box-shadow-hover: 0 16px 48px rgba(0,0,0,0.6); --neon-glow-primary: 0 0 20px color-mix(in srgb, var(--primary-color) 40%, transparent), 0 0 40px color-mix(in srgb, var(--primary-color) 20%, transparent); --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--background-color); color: var(--text-color); font-family: var(--font-family); line-height: 1.6; }
+        .container { width: 90%; max-width: 1200px; margin: 0 auto; }
+        .page { display: none; } .page.active { display: block; animation: pageSlideIn 0.5s ease-out; }
+        @keyframes pageSlideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        header { padding: 1.2rem 0; position: sticky; top: 0; z-index: 1000; background: var(--header-background); backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--border-color); }
+        .header-content { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+        .logo { display: flex; align-items: center; gap: 14px; font-size: 1.6rem; font-weight: 800; cursor: pointer; } .logo i { color: var(--primary-color); }
+        .header-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+        .nav-link, .header-btn { color: var(--text-color); text-decoration: none; font-weight: 600; padding: 0.7rem 1.4rem; border-radius: var(--border-radius-sm); transition: var(--transition); font-family: var(--font-family); font-size: 1rem; background: none; border: none; cursor: pointer; }
+        .nav-link.active { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: #000; box-shadow: var(--neon-glow-primary); }
+        .header-btn { border: 1px solid var(--border-color); color: var(--text-muted-color); height: 44px; }
+        .header-btn:hover, .nav-link:hover:not(.active) { background-color: rgba(128, 128, 128, 0.15); color: var(--primary-color); }
+        #theme-switcher-btn, #reset-all-btn { width: 44px; } #reset-all-btn:hover { background-color: var(--danger-color); color: #fff; transform: scale(1.1) rotate(15deg); }
+
+        main { min-height: calc(100vh - 200px); padding: 3rem 0; }
+        .page-title { text-align: center; margin-bottom: 3rem; font-size: 2.5rem; font-weight: 800; } .page-title i { color: var(--primary-color); }
+        .controls-container { display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 3rem; }
+        .search-container { position: relative; flex-grow: 1; min-width: 300px; }
+        .search-input { width: 100%; padding: 1rem 3.5rem; border: 2px solid var(--border-color); border-radius: 50px; font-size: 1rem; background: var(--surface-color); color: var(--text-color); }
+        .search-input:focus { outline: none; border-color: var(--primary-color); }
+        .search-icon { position: absolute; left: 1.5rem; top: 50%; transform: translateY(-50%); color: var(--text-muted-color); }
+        .filter-select { background-color: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 0.6rem 1rem; color: var(--text-color); }
+
+        .post-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem; }
+        .post-card { background: var(--surface-color); border-radius: var(--border-radius); border: 1px solid var(--border-color); transition: var(--transition); display: flex; flex-direction: column; overflow: hidden; }
+        .post-card:hover { transform: translateY(-8px); box-shadow: var(--box-shadow-hover); }
+        .post-card-media { width: 100%; height: 220px; object-fit: cover; background-color: var(--background-color); display: flex; align-items: center; justify-content: center; }
+        .post-card-content { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }
+        .post-card-title { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 0.75rem; }
+        .post-card-meta { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted-color); margin-bottom: 1rem; flex-wrap: wrap; }
+        .post-card-description { flex-grow: 1; margin-bottom: 1.5rem; line-height: 1.5; }
+        .post-card-footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+        .post-card-actions { display: flex; gap: 0.5rem; }
+        .action-btn { background: var(--surface-hover); color: var(--text-muted-color); border: none; border-radius: var(--border-radius-sm); width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem; }
+        .action-btn.edit-btn:hover { background-color: var(--warning-color); color: #000; }
+        .action-btn.delete-btn:hover { background-color: var(--danger-color); color: #fff; }
+        
+        .form-container { max-width: 800px; margin: 0 auto; background: var(--surface-color); padding: 2.5rem; border-radius: 24px; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+        .form-control { width: 100%; padding: 0.9rem 1rem; border: 2px solid var(--border-color); border-radius: var(--border-radius-sm); font-size: 1rem; background: var(--background-color); color: var(--text-color); }
+        textarea.form-control { min-height: 150px; }
+        #media-preview { margin-top: 1rem; border-radius: var(--border-radius-sm); overflow: hidden; border: 2px solid var(--border-color); min-height: 50px; background-color: var(--background-color); display: flex; justify-content: center; align-items: center; }
+        #media-preview img { max-width: 100%; max-height: 300px; }
+        .form-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem; }
+        .btn { padding: 0.8rem 1.8rem; border-radius: var(--border-radius-sm); font-weight: 700; cursor: pointer; transition: var(--transition); border: none; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: #000; }
+        .btn-secondary { background-color: var(--surface-hover); color: var(--text-color); }
+        .btn:hover { transform: translateY(-3px); }
+
+        #single-post-page .container { max-width: 900px; }
+        #single-post-media { width: 100%; margin-bottom: 2rem; border-radius: var(--border-radius); overflow: hidden; background: var(--background-color); }
+        #single-post-media img, #single-post-media video, #single-post-media audio { width: 100%; max-height: 60vh; display: block; }
+        #single-post-media iframe { width: 100%; height: 60vh; border: none; }
+        .media-placeholder { padding: 4rem; text-align: center; } .media-placeholder i { font-size: 5rem; color: var(--primary-color); } .media-placeholder p { margin-top: 1rem; font-size: 1.2rem; }
+        #single-post-title { font-size: 2.8rem; color: var(--primary-color); }
+        .single-post-meta { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; color: var(--text-muted-color); margin-bottom: 2rem; }
+        #single-post-description { line-height: 1.7; font-size: 1.1rem; white-space: pre-wrap; word-wrap: break-word; }
+        #single-post-description a { color: var(--primary-color); }
+        .single-post-cta { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
+
+        footer { padding: 2.5rem 0; margin-top: 3rem; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-muted-color); }
+        .footer-links { display: flex; justify-content: center; gap: 2rem; list-style: none; margin-bottom: 1rem; }
+        .footer-links a { color: var(--text-muted-color); text-decoration: none; font-size: 1.1rem; transition: var(--transition); } .footer-links a:hover { color: var(--primary-color); transform: translateY(-3px); } .footer-links i { margin-right: 0.5rem; }
+        
+        .toast, .custom-alert-overlay { position: fixed; z-index: 9998; }
+        .toast { bottom: 20px; right: 20px; color: white; padding: 1rem 1.5rem; border-radius: var(--border-radius); opacity: 0; transform: translateY(100px); transition: all 0.5s ease; } .toast.show { transform: translateY(0); opacity: 1; }
+        .custom-alert-overlay { top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; } .custom-alert-overlay.show { opacity: 1; visibility: visible; }
+        .custom-alert-box { background: var(--surface-color); padding: 2.5rem; border-radius: 24px; width: 90%; max-width: 450px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <div class="header-content">
+            <div class="logo" id="logo-btn"><i class="fas fa-rss-square"></i><span>Admin Blog</span></div>
+            <div class="header-actions">
+                <a href="#" class="nav-link" id="home-nav-link">Accueil</a>
+                <a href="#" class="nav-link" id="add-post-nav-link">Ajouter</a>
+                <button class="header-btn" id="relink-files-btn" title="Gérer les fichiers manquants"><i class="fas fa-sync"></i> Relier Fichiers</button>
+                <button class="header-btn" id="import-btn"><i class="fas fa-file-import"></i> Importer</button>
+                <button class="header-btn" id="export-btn"><i class="fas fa-file-export"></i> Exporter</button>
+                <button class="header-btn" id="theme-switcher-btn" title="Changer de thème"><i class="fas fa-palette"></i></button>
+                <button class="header-btn" id="reset-all-btn" title="Tout supprimer"><i class="fas fa-trash-alt"></i></button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <!-- Page d'accueil -->
+    <section id="home-page" class="page">
+        <div class="container">
+            <h2 class="page-title"><i class="fas fa-newspaper"></i>Mes Articles</h2>
+            <div class="controls-container">
+                <div class="search-container">
+                    <input type="text" id="search-input" class="search-input" placeholder="Rechercher...">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <select id="sort-select" class="filter-select">
+                    <option value="date-desc">Plus récent</option><option value="date-asc">Plus ancien</option>
+                    <option value="title-asc">Titre (A-Z)</option><option value="title-desc">Titre (Z-A)</option>
+                </select>
+            </div>
+            <div id="post-list-container" class="post-list"></div>
+        </div>
+    </section>
+
+    <!-- Page d'ajout/modification -->
+    <section id="add-edit-page" class="page">
+        <div class="container">
+            <h2 class="page-title"><i class="fas fa-pencil-alt"></i><span id="form-title"></span></h2>
+            <div class="form-container">
+                <form id="post-form">
+                    <input type="hidden" id="post-id">
+                    <div class="form-group"><label for="post-title">Titre</label><input type="text" id="post-title" class="form-control" required></div>
+                    <div class="form-group"><label for="post-main-file">Fichier principal (Vidéo, Image, PDF, ZIP, etc.)</label><input type="file" id="post-main-file" class="form-control"></div>
+                    <div class="form-group" id="thumbnail-group" style="display: none;"><label for="post-thumbnail-file">Vignette personnalisée (facultatif)</label><input type="file" id="post-thumbnail-file" class="form-control" accept="image/*"></div>
+                    <div class="form-group"><label>Prévisualisation</label><div id="media-preview"></div></div>
+                    <div class="form-group"><label for="post-description">Description</label><textarea id="post-description" class="form-control"></textarea></div>
+                    <div class="form-group"><label for="post-telegram">Lien Canal Telegram (facultatif)</label><input type="url" id="post-telegram" class="form-control"></div>
+                    <div class="form-group"><label for="post-author">Auteur</label><input type="text" id="post-author" class="form-control" required></div>
+                    <div class="form-actions">
+                        <button type="button" id="cancel-btn" class="btn btn-secondary">Annuler</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> <span id="save-btn-text"></span></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Page de l'article unique -->
+    <section id="single-post-page" class="page">
+        <div class="container">
+            <button id="back-to-home-btn" class="btn btn-secondary" style="margin-bottom: 2rem;"><i class="fas fa-arrow-left"></i> Retour</button>
+            <article>
+                <div id="single-post-media"></div><h1 id="single-post-title"></h1>
+                <div class="single-post-meta"><span id="single-post-author"></span><span id="single-post-date"></span></div>
+                <div id="single-post-description"></div>
+                <div class="single-post-cta" id="single-post-cta"></div>
+            </article>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="container">
+        <ul class="footer-links">
+            <li><a href="mailto:es2iprompter@gmail.com"><i class="fas fa-envelope"></i> Email</a></li>
+            <li><a href="https://wa.me/2250719030672" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+            <li><a href="https://jadpot.com" target="_blank" rel="noopener"><i class="fas fa-briefcase"></i> Portfolio</a></li>
+        </ul>
+        <p>&copy; 2025 Mon Blog. Tous droits réservés.</p>
+    </div>
+</footer>
+
+<!-- Modals & Inputs cachés -->
+<input type="file" id="import-file-input" accept=".json" style="display: none;">
+<input type="file" id="relink-file-input" style="display: none;">
+<div id="toast" class="toast"></div>
+<div id="custom-alert-overlay" class="custom-alert-overlay">
+    <div class="custom-alert-box"><h3 id="custom-alert-title"></h3><p id="custom-alert-message"></p><div id="custom-alert-buttons"></div></div>
+</div>
+
+<!-- ============================ JAVASCRIPT INTÉGRÉ ============================ -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const appState = { posts: [], themes: ['default', 'ocean', 'sunset'], currentThemeIndex: 0 };
+    const UIElements = {
+        pages: document.querySelectorAll('.page'), logoBtn: document.getElementById('logo-btn'), homeNavLink: document.getElementById('home-nav-link'),
+        addPostNavLink: document.getElementById('add-post-nav-link'), postListContainer: document.getElementById('post-list-container'),
+        searchInput: document.getElementById('search-input'), sortSelect: document.getElementById('sort-select'), form: document.getElementById('post-form'),
+        formTitle: document.getElementById('form-title'), postId: document.getElementById('post-id'), postTitle: document.getElementById('post-title'),
+        postMainFile: document.getElementById('post-main-file'), thumbnailGroup: document.getElementById('thumbnail-group'),
+        postThumbnailFile: document.getElementById('post-thumbnail-file'), mediaPreview: document.getElementById('media-preview'),
+        postDescription: document.getElementById('post-description'), postTelegram: document.getElementById('post-telegram'), postAuthor: document.getElementById('post-author'),
+        saveBtnText: document.getElementById('save-btn-text'), cancelBtn: document.getElementById('cancel-btn'),
+        singlePostPage: document.getElementById('single-post-page'), singlePostMedia: document.getElementById('single-post-media'),
+        singlePostTitle: document.getElementById('single-post-title'), singlePostAuthor: document.getElementById('single-post-author'),
+        singlePostDate: document.getElementById('single-post-date'), singlePostDescription: document.getElementById('single-post-description'),
+        singlePostCta: document.getElementById('single-post-cta'), backToHomeBtn: document.getElementById('back-to-home-btn'),
+        relinkFilesBtn: document.getElementById('relink-files-btn'), relinkFileInput: document.getElementById('relink-file-input'),
+        importBtn: document.getElementById('import-btn'), exportBtn: document.getElementById('export-btn'), importFileInput: document.getElementById('import-file-input'),
+        themeSwitcherBtn: document.getElementById('theme-switcher-btn'), resetAllBtn: document.getElementById('reset-all-btn'),
+        toast: document.getElementById('toast'), alert: { overlay: document.getElementById('custom-alert-overlay'), title: document.getElementById('custom-alert-title'), message: document.getElementById('custom-alert-message'), buttons: document.getElementById('custom-alert-buttons') }
+    };
+
+    // --- Database Logic (IndexedDB) ---
+    let db;
+    function initDB(callback) {
+        const request = indexedDB.open('StaticBlogDB', 1);
+        request.onerror = (e) => console.error("Database error:", e.target.error);
+        request.onupgradeneeded = (e) => {
+            db = e.target.result;
+            db.createObjectStore('files', { keyPath: 'id' });
+        };
+        request.onsuccess = (e) => {
+            db = e.target.result;
+            callback();
+        };
+    }
+
+    function saveFile(id, file, thumbnail) {
+        if (!db) return;
+        const transaction = db.transaction(['files'], 'readwrite');
+        const store = transaction.objectStore('files');
+        store.put({ id: id, file: file, thumbnail: thumbnail });
+    }
+
+    function getFile(id, callback) {
+        if (!db) return;
+        const transaction = db.transaction(['files'], 'readonly');
+        const store = transaction.objectStore('files');
+        const request = store.get(id);
+        request.onsuccess = () => callback(request.result);
+    }
+
+    function deleteFile(id) {
+        if (!db) return;
+        const transaction = db.transaction(['files'], 'readwrite');
+        const store = transaction.objectStore('files');
+        store.delete(id);
+    }
+
+    // --- Core App Logic ---
+    function init() {
+        loadTheme();
+        initializeEventListeners();
+        loadMetadataFromStorage();
+        navigateTo('home-page');
+    }
+
+    function navigateTo(pageId) {
+        UIElements.pages.forEach(p => p.classList.toggle('active', p.id === pageId));
+        UIElements.homeNavLink.classList.toggle('active', pageId === 'home-page');
+        UIElements.addPostNavLink.classList.toggle('active', pageId === 'add-edit-page');
+        if (pageId === 'home-page') displayPostList();
+    }
+
+    function loadMetadataFromStorage() {
+        const savedData = localStorage.getItem('staticBlogMetadata');
+        appState.posts = savedData ? JSON.parse(savedData) : [];
+    }
+
+    function saveMetadataToStorage() { localStorage.setItem('staticBlogMetadata', JSON.stringify(appState.posts)); }
+
+    // --- Display Logic ---
+    async function displayPostList() {
+        UIElements.postListContainer.innerHTML = '';
+        const searchTerm = normalizeString(UIElements.searchInput.value);
+        const filtered = appState.posts.filter(p => normalizeString(p.title).includes(searchTerm) || normalizeString(p.author).includes(searchTerm));
+        filtered.sort((a, b) => new Date(appState.currentSort === 'date-asc' ? a.createdAt : b.createdAt) - new Date(appState.currentSort === 'date-asc' ? b.createdAt : a.createdAt));
+
+        if(filtered.length === 0) {
+            UIElements.postListContainer.innerHTML = `<p style="grid-column: 1 / -1; text-align: center;">Aucun article. Cliquez sur "Ajouter".</p>`;
+            return;
+        }
+
+        for (const post of filtered) {
+            const card = document.createElement('div');
+            card.className = 'post-card';
+            const formattedDate = new Date(post.createdAt).toLocaleString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+            const mediaHTML = await new Promise(resolve => {
+                getFile(post.id, (data) => {
+                    if (data && data.thumbnail) {
+                        resolve(`<img src="${URL.createObjectURL(data.thumbnail)}" class="post-card-media">`);
+                    } else if (data && data.file && data.file.type.startsWith('image/')) {
+                        resolve(`<img src="${URL.createObjectURL(data.file)}" class="post-card-media">`);
+                    } else {
+                        resolve(`<img src="${getFileTypeDefaultImage(post.fileName)}" class="post-card-media">`);
+                    }
+                });
+            });
+
+            card.innerHTML = `
+                <div class="post-card-media">${mediaHTML}</div>
+                <div class="post-card-content">
+                    <h3 class="post-card-title">${post.title}</h3>
+                    <div class="post-card-meta"><span><i class="fas fa-user"></i> ${post.author}</span><span><i class="fas fa-clock"></i> ${formattedDate}</span></div>
+                    <p class="post-card-description">${post.description.substring(0, 100)}...</p>
+                    <div class="post-card-footer">
+                        <button class="btn btn-primary read-more-btn" data-id="${post.id}">Voir Plus</button>
+                        <div class="post-card-actions">
+                            <button class="action-btn edit-btn" title="Modifier" data-id="${post.id}"><i class="fas fa-pencil-alt"></i></button>
+                            <button class="action-btn delete-btn" title="Supprimer" data-id="${post.id}"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>`;
+            UIElements.postListContainer.appendChild(card);
+        }
+    }
+    
+    function displaySinglePost(postId) {
+        const post = appState.posts.find(p => p.id === postId); if (!post) return;
+        UIElements.singlePostTitle.textContent = post.title;
+        UIElements.singlePostAuthor.innerHTML = `<i class="fas fa-user"></i> ${post.author}`;
+        UIElements.singlePostDate.innerHTML = `<i class="fas fa-calendar-alt"></i> ${new Date(post.createdAt).toLocaleString('fr-FR', { dateStyle: 'full', timeStyle: 'short' })}`;
+        UIElements.singlePostDescription.innerHTML = linkify(post.description);
+        UIElements.singlePostCta.innerHTML = ''; // Clear previous buttons
+
+        getFile(post.id, (data) => {
+            if (data && data.file) {
+                const fileURL = URL.createObjectURL(data.file);
+                const fileType = data.file.type;
+                let mediaHTML = '';
+                let canBeRead = false;
+                
+                if (fileType.startsWith('video/')) { mediaHTML = `<video src="${fileURL}" controls></video>`; canBeRead = true; }
+                else if (fileType.startsWith('image/')) { mediaHTML = `<img src="${fileURL}">`; }
+                else if (fileType.startsWith('audio/')) { mediaHTML = `<audio src="${fileURL}" controls></audio>`; canBeRead = true; }
+                else if (fileType === 'application/pdf') { mediaHTML = `<iframe src="${fileURL}"></iframe>`; canBeRead = true; }
+                else {
+                    mediaHTML = `<div class="media-placeholder"><i class="fas fa-file-alt"></i><p>${post.fileName}</p></div>`;
+                }
+                UIElements.singlePostMedia.innerHTML = mediaHTML;
+
+                // CTA Buttons
+                if(canBeRead) UIElements.singlePostCta.innerHTML += `<a href="${fileURL}" target="_blank" class="btn btn-secondary"><i class="fas fa-eye"></i> Ouvrir dans un nouvel onglet</a>`;
+                UIElements.singlePostCta.innerHTML += `<a href="${fileURL}" download="${post.fileName}" class="btn btn-success"><i class="fas fa-download"></i> Télécharger le Fichier</a>`;
+            } else {
+                UIElements.singlePostMedia.innerHTML = `<div class="media-placeholder"><i class="fas fa-exclamation-triangle"></i><p>Fichier manquant !</p></div>`;
+                 UIElements.singlePostCta.innerHTML = `<button class="btn btn-warning relink-single-btn" data-id="${post.id}"><i class="fas fa-sync"></i> Relier le fichier manquant</button>`;
+            }
+            if(post.telegramUrl) UIElements.singlePostCta.innerHTML += `<a href="${post.telegramUrl}" target="_blank" rel="noopener" class="btn btn-primary"><i class="fab fa-telegram-plane"></i> Canal Telegram</a>`;
+        });
+        navigateTo('single-post-page');
+    }
+
+    // --- Form & CRUD Logic ---
+    function handleFormSubmit(e) {
+        e.preventDefault();
+        const mainFile = UIElements.postMainFile.files[0];
+        const thumbFile = UIElements.postThumbnailFile.files[0];
+        const id = UIElements.postId.value;
+
+        if (!id && !mainFile) {
+            showToast("Veuillez sélectionner un fichier principal.", "warning");
+            return;
+        }
+
+        const postData = {
+            title: UIElements.postTitle.value.trim(),
+            description: UIElements.postDescription.value,
+            telegramUrl: UIElements.postTelegram.value.trim(),
+            author: UIElements.postAuthor.value.trim(),
+            fileName: mainFile ? mainFile.name : appState.posts.find(p=>p.id === id).fileName,
+        };
+
+        if (id) { // Update
+            const index = appState.posts.findIndex(p => p.id === id);
+            appState.posts[index] = { ...appState.posts[index], ...postData };
+            getFile(id, data => saveFile(id, mainFile || data.file, thumbFile || data.thumbnail));
+            showToast('Article mis à jour !', 'success');
+        } else { // Create
+            postData.id = 'post-' + Date.now();
+            postData.createdAt = new Date().toISOString();
+            appState.posts.push(postData);
+            saveFile(postData.id, mainFile, thumbFile);
+            showToast('Article publié !', 'success');
+        }
+        
+        saveMetadataToStorage(); navigateTo('home-page');
+    }
+    
+    function prepareForm(postId = null) {
+        UIElements.form.reset(); UIElements.mediaPreview.innerHTML = ''; UIElements.thumbnailGroup.style.display = 'none';
+        if (postId) {
+            const post = appState.posts.find(p => p.id === postId); if (!post) return;
+            UIElements.formTitle.textContent = 'Modifier l\'Article'; UIElements.saveBtnText.textContent = 'Mettre à jour';
+            UIElements.postId.value = post.id; UIElements.postTitle.value = post.title;
+            UIElements.postDescription.value = post.description; UIElements.postTelegram.value = post.telegramUrl || ''; UIElements.postAuthor.value = post.author;
+            showToast("Laisser le champ 'Fichier' vide pour conserver l'ancien.", "info");
+        } else {
+            UIElements.formTitle.textContent = 'Ajouter un Article'; UIElements.saveBtnText.textContent = 'Publier';
+            UIElements.postId.value = ''; UIElements.postAuthor.value = localStorage.getItem('blogAuthorName') || 'Votre Nom';
+        }
+        navigateTo('add-edit-page');
+    }
+
+    function handleDeletePost(postId) {
+        showConfirmation('Supprimer l\'article', 'Êtes-vous sûr ? Cette action est irréversible.', [
+            { text: 'Annuler', class: 'btn-secondary', value: false }, { text: 'Supprimer', class: 'btn-danger', value: true }
+        ]).then(confirmed => {
+            if (confirmed) {
+                appState.posts = appState.posts.filter(p => p.id !== postId);
+                deleteFile(postId);
+                saveMetadataToStorage();
+                displayPostList();
+                showToast('Article supprimé.', 'success');
+            }
+        });
+    }
+
+    function handleResetAll() {
+        showConfirmation('Supprimer Tout', 'TOUS les articles et fichiers seront effacés. Continuer ?', [
+            { text: 'Annuler', class: 'btn-secondary', value: false }, { text: 'Tout Supprimer', class: 'btn-danger', value: true }
+        ]).then(confirmed => {
+            if(confirmed) {
+                appState.posts.forEach(p => deleteFile(p.id));
+                appState.posts = [];
+                localStorage.removeItem('staticBlogMetadata');
+                displayPostList();
+                showToast('Toutes les données ont été effacées.', 'success');
+            }
+        });
+    }
+    
+    // --- Utility & Helper Functions ---
+    function updateMediaPreview() {
+        const mainFile = UIElements.postMainFile.files[0]; const thumbFile = UIElements.postThumbnailFile.files[0];
+        const fileType = mainFile ? mainFile.type : '';
+        UIElements.thumbnailGroup.style.display = (fileType.startsWith('video/') || fileType.startsWith('audio/') || fileType === 'application/pdf' || fileType.includes('zip') || fileType.includes('rar')) ? 'block' : 'none';
+
+        if(thumbFile) { UIElements.mediaPreview.innerHTML = `<img src="${URL.createObjectURL(thumbFile)}">`; }
+        else if(mainFile && mainFile.type.startsWith('image/')) { UIElements.mediaPreview.innerHTML = `<img src="${URL.createObjectURL(mainFile)}">`; }
+        else if (mainFile) { UIElements.mediaPreview.innerHTML = `<img src="${getFileTypeDefaultImage(mainFile.name)}">`; }
+        else { UIElements.mediaPreview.innerHTML = ''; }
+    }
+
+    function getFileTypeDefaultImage(fileName) {
+        if (!fileName) return 'file.png';
+        const ext = fileName.split('.').pop().toLowerCase();
+        if (['mp4', 'mov', 'webm', 'avi'].includes(ext)) return 'video.png';
+        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) return 'image.png';
+        if (['mp3', 'wav', 'ogg'].includes(ext)) return 'musique.png';
+        if (ext === 'pdf') return 'pdf.png';
+        if (ext === 'zip') return 'zip.png';
+        if (ext === 'rar') return 'rar.png';
+        return 'file.png';
+    }
+
+    function normalizeString(str) { return typeof str === 'string' ? str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : ''; }
+    function linkify(text) { const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig; return text.replace(urlRegex, url => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`); }
+    function showToast(message, type = 'success') { UIElements.toast.className = `toast show ${type}`; UIElements.toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'times-circle'}"></i><span>${message}</span>`; setTimeout(() => UIElements.toast.classList.remove('show'), 3000); }
+    function showConfirmation(title, message, buttons) { return new Promise(resolve => { const a = UIElements.alert; a.title.textContent = title; a.message.textContent = message; a.buttons.innerHTML = ''; buttons.forEach(bI => { const btn=document.createElement('button'); btn.className=`btn ${bI.class}`; btn.innerHTML=bI.text; btn.onclick=()=>{a.overlay.classList.remove('show'); resolve(bI.value);}; a.buttons.appendChild(btn); }); a.overlay.classList.add('show'); }); }
+
+    // --- Event Listeners ---
+    function initializeEventListeners() {
+        UIElements.logoBtn.addEventListener('click', () => navigateTo('home-page'));
+        UIElements.homeNavLink.addEventListener('click', (e) => { e.preventDefault(); navigateTo('home-page'); });
+        UIElements.addPostNavLink.addEventListener('click', (e) => { e.preventDefault(); prepareForm(); });
+        UIElements.searchInput.addEventListener('input', displayPostList);
+        UIElements.sortSelect.addEventListener('change', (e) => { appState.currentSort = e.target.value; displayPostList(); });
+        UIElements.form.addEventListener('submit', handleFormSubmit);
+        UIElements.postMainFile.addEventListener('change', updateMediaPreview);
+        UIElements.postThumbnailFile.addEventListener('change', updateMediaPreview);
+        UIElements.cancelBtn.addEventListener('click', () => navigateTo('home-page'));
+        UIElements.backToHomeBtn.addEventListener('click', () => navigateTo('home-page'));
+        UIElements.postAuthor.addEventListener('change', (e) => localStorage.setItem('blogAuthorName', e.target.value));
+        UIElements.postListContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('.read-more-btn, .edit-btn, .delete-btn'); if (!btn) return;
+            const id = btn.dataset.id;
+            if (btn.classList.contains('read-more-btn')) displaySinglePost(id);
+            else if (btn.classList.contains('edit-btn')) prepareForm(id);
+            else if (btn.classList.contains('delete-btn')) handleDeletePost(id);
+        });
+        UIElements.singlePostPage.addEventListener('click', (e) => {
+             const btn = e.target.closest('.relink-single-btn'); if(!btn) return;
+             relinkSingleFile(btn.dataset.id);
+        });
+
+        UIElements.importBtn.addEventListener('click', () => showConfirmation('Importer', 'Importer un fichier de métadonnées. Les fichiers multimédias devront être reliés manuellement.', [
+            { text: 'Annuler', class: 'btn-secondary', value: false }, { text: 'Continuer', class: 'btn-primary', value: true }
+        ]).then(ok => ok && UIElements.importFileInput.click()));
+        UIElements.importFileInput.addEventListener('change', (e) => { /* ... Import logic ... */ });
+        UIElements.exportBtn.addEventListener('click', () => { /* ... Export logic ... */ });
+        UIElements.themeSwitcherBtn.addEventListener('click', () => { /* ... Theme logic ... */ });
+        UIElements.resetAllBtn.addEventListener('click', handleResetAll);
+        UIElements.relinkFilesBtn.addEventListener('click', checkAndRelinkFiles);
+    }
+
+    async function checkAndRelinkFiles() {
+        showToast("Vérification des fichiers...", "info");
+        const missingFiles = [];
+        for(const post of appState.posts) {
+            const isMissing = await new Promise(resolve => getFile(post.id, data => resolve(!data || !data.file)));
+            if (isMissing) missingFiles.push(post);
+        }
+        if (missingFiles.length === 0) return showToast("Tous les fichiers sont présents !", "success");
+
+        const confirmed = await showConfirmation(`${missingFiles.length} fichier(s) manquant(s)`, 'Voulez-vous les relier maintenant ? Vous devrez sélectionner chaque fichier manquant un par un.', [
+             { text: 'Annuler', class: 'btn-secondary', value: false }, { text: 'Commencer', class: 'btn-primary', value: true }
+        ]);
+        if (!confirmed) return;
+        for (const post of missingFiles) {
+            await relinkSingleFile(post.id, post.fileName);
+        }
+        showToast("Processus de liaison terminé.", "success");
+        if (appState.currentPage === 'home-page') displayPostList();
+    }
+    
+    function relinkSingleFile(postId, fileName) {
+        return new Promise(resolve => {
+            showToast(`Veuillez sélectionner le fichier pour : "${fileName || postId}"`, "info");
+            UIElements.relinkFileInput.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    getFile(postId, (data) => saveFile(postId, file, data ? data.thumbnail : null));
+                    showToast(`Fichier "${file.name}" relié !`, "success");
+                }
+                UIElements.relinkFileInput.value = '';
+                resolve();
+            };
+            UIElements.relinkFileInput.click();
+        });
+    }
+
+    function loadTheme() { const savedTheme = localStorage.getItem('blogTheme') || 'default'; const themeIndex = appState.themes.indexOf(savedTheme); appState.currentThemeIndex = themeIndex !== -1 ? themeIndex : 0; document.documentElement.setAttribute('data-theme', appState.themes[appState.currentThemeIndex]); }
+    
+    initDB(init);
+});
+</script>
+
+</body>
+</html>

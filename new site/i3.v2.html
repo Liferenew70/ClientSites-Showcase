@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Blog Statique</title>
+    
+    <meta property="og:title" content="Mon Blog Statique Personnel">
+    <meta property="og:description" content="Découvrez mes articles, pensées et créations multimédias.">
+    <meta property="og:type" content="website">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    
+    <!-- ================================ CSS INTÉGRÉ ================================= -->
+    <style>
+        :root[data-theme="default"] { --primary-color: #34d399; --secondary-color: #10b981; --background-color: #0a0e14; --surface-color: #151922; --text-color: #e4e8f0; --text-muted-color: #8b96a8; --border-color: #242b38; }
+        :root[data-theme="ocean"] { --primary-color: #3b82f6; --secondary-color: #2563eb; --background-color: #0c1425; --surface-color: #1a2338; --text-color: #e2e8f0; --text-muted-color: #94a3b8; --border-color: #334155; }
+        :root[data-theme="sunset"] { --primary-color: #f97316; --secondary-color: #ea580c; --background-color: #1c100a; --surface-color: #2e1c13; --text-color: #fde6d8; --text-muted-color: #d1b8ab; --border-color: #573d2f; }
+        :root { --header-background: rgba(10, 14, 20, 0.85); --success-color: #10b981; --danger-color: #ef4444; --warning-color: #f59e0b; --font-family: 'Inter', 'Segoe UI', sans-serif; --border-radius: 16px; --border-radius-sm: 12px; --box-shadow: 0 8px 32px rgba(0,0,0,0.4); --box-shadow-hover: 0 16px 48px rgba(0,0,0,0.6); --neon-glow-primary: 0 0 20px color-mix(in srgb, var(--primary-color) 40%, transparent), 0 0 40px color-mix(in srgb, var(--primary-color) 20%, transparent); --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--background-color); color: var(--text-color); font-family: var(--font-family); line-height: 1.6; transition: var(--transition); }
+        .container { width: 90%; max-width: 1200px; margin: 0 auto; }
+        .page { display: none; }
+        .page.active { display: block; animation: pageSlideIn 0.5s ease-out; }
+        @keyframes pageSlideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Header */
+        header { padding: 1.2rem 0; position: sticky; top: 0; z-index: 1000; background: var(--header-background); backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--border-color); }
+        .header-content { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+        .logo { display: flex; align-items: center; gap: 14px; font-size: 1.6rem; font-weight: 800; cursor: pointer; }
+        .logo i { color: var(--primary-color); filter: drop-shadow(var(--neon-glow-primary)); }
+        .header-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+        .nav-link, .header-btn { color: var(--text-color); text-decoration: none; font-weight: 600; padding: 0.7rem 1.4rem; border-radius: var(--border-radius-sm); transition: var(--transition); font-family: var(--font-family); font-size: 1rem; background: none; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.6rem; }
+        .nav-link.active { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: #000; font-weight: 700; box-shadow: var(--neon-glow-primary); }
+        .header-btn { border: 1px solid var(--border-color); color: var(--text-muted-color); height: 44px; }
+        .header-btn:hover, .nav-link:hover:not(.active) { background-color: rgba(128, 128, 128, 0.15); color: var(--primary-color); }
+        #theme-switcher-btn, #reset-all-btn { width: 44px; } #theme-switcher-btn:hover { transform: scale(1.1) rotate(-15deg); border-color: var(--primary-color); }
+        #reset-all-btn:hover { background-color: var(--danger-color); color: #fff; transform: scale(1.1) rotate(15deg); border-color: var(--danger-color); box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
+
+        /* Main Content & Controls */
+        main { min-height: calc(100vh - 200px); padding: 3rem 0; }
+        .page-title { text-align: center; margin-bottom: 3rem; font-size: 2.5rem; font-weight: 800; }
+        .page-title i { color: var(--primary-color); margin-right: 1rem; }
+        .controls-container { display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 3rem; }
+        .search-container { position: relative; flex-grow: 1; min-width: 300px; }
+        .search-input { width: 100%; padding: 1rem 3.5rem; border: 2px solid var(--border-color); border-radius: 50px; font-size: 1rem; transition: var(--transition); background: var(--surface-color); color: var(--text-color); }
+        .search-input:focus { outline: none; border-color: var(--primary-color); box-shadow: var(--neon-glow-primary); }
+        .search-icon { position: absolute; left: 1.5rem; top: 50%; transform: translateY(-50%); color: var(--text-muted-color); }
+        .filter-select { background-color: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 0.6rem 1rem; color: var(--text-color); font-weight: 500; cursor: pointer; }
+
+        /* Categories Grid */
+        .categories-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+        .category-card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 1.5rem; cursor: pointer; transition: var(--transition); position: relative; overflow: hidden; }
+        .category-card:hover { transform: translateY(-8px); box-shadow: var(--box-shadow-hover); border-color: var(--primary-color); }
+        .category-card .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+        .category-card .card-icon { font-size: 1.5rem; color: var(--primary-color); width: 50px; height: 50px; border-radius: var(--border-radius-sm); background: var(--background-color); display: flex; align-items: center; justify-content: center; }
+        .category-card .card-count { background: rgba(128,128,128,0.2); padding: 0.2rem 0.7rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+        .category-card h3 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+        .category-card p { font-size: 0.9rem; color: var(--text-muted-color); }
+
+        /* Post List & Cards */
+        .post-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem; }
+        .post-card { background: var(--surface-color); border-radius: var(--border-radius); border: 1px solid var(--border-color); transition: var(--transition); display: flex; flex-direction: column; overflow: hidden; }
+        .post-card:hover { transform: translateY(-8px); box-shadow: var(--box-shadow-hover); border-color: var(--primary-color); }
+        .post-card-media { width: 100%; height: 220px; object-fit: cover; background-color: var(--background-color); display: flex; align-items: center; justify-content: center; }
+        .post-card-media img, .post-card-media iframe { width: 100%; height: 100%; border: none; object-fit: cover; }
+        .post-card-content { padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1; }
+        .post-card-title { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 0.75rem; }
+        .post-card-meta { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted-color); margin-bottom: 1rem; flex-wrap: wrap; }
+        .post-card-description { flex-grow: 1; margin-bottom: 1.5rem; line-height: 1.5; }
+        .post-card-footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+        .post-card-actions { display: flex; gap: 0.5rem; }
+        .action-btn { background: rgba(128,128,128,0.1); color: var(--text-muted-color); border: none; border-radius: var(--border-radius-sm); width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); font-size: 0.9rem; }
+        .action-btn.edit-btn:hover { background-color: var(--warning-color); color: #000; }
+        .action-btn.delete-btn:hover { background-color: var(--danger-color); color: #fff; }
+        
+        /* Form */
+        .form-container { max-width: 800px; margin: 0 auto; background: var(--surface-color); padding: 2.5rem; border-radius: 24px; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+        .form-control { width: 100%; padding: 0.9rem 1rem; border: 2px solid var(--border-color); border-radius: var(--border-radius-sm); font-size: 1rem; transition: var(--transition); background: var(--background-color); color: var(--text-color); }
+        .form-control:focus { outline: none; border-color: var(--primary-color); }
+        textarea.form-control { min-height: 150px; resize: vertical; }
+        #media-preview { margin-top: 1rem; border-radius: var(--border-radius-sm); overflow: hidden; border: 2px solid var(--border-color); min-height: 50px; background-color: var(--background-color); display: flex; justify-content: center; align-items: center; }
+        #media-preview img, #media-preview iframe { width: 100%; height: auto; max-height: 400px; display: block; border: none; aspect-ratio: 16 / 9; object-fit: cover; }
+        .form-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem; }
+        .btn { padding: 0.8rem 1.8rem; border-radius: var(--border-radius-sm); font-weight: 700; cursor: pointer; transition: var(--transition); border: none; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: #000; }
+        .btn-secondary { background-color: rgba(128,128,128,0.15); color: var(--text-color); }
+        .btn:hover { transform: translateY(-3px); box-shadow: var(--box-shadow-hover); }
+
+        /* Single Post Page */
+        #single-post-page .container { max-width: 800px; }
+        #single-post-media { width: 100%; margin-bottom: 2rem; border-radius: var(--border-radius); overflow: hidden; }
+        #single-post-media img { width: 100%; height: auto; max-height: 600px; display: block; border: none; }
+        #single-post-media iframe { width: 100%; height: auto; aspect-ratio: 16 / 9; display: block; border: none; }
+        #single-post-title { font-size: 2.8rem; color: var(--primary-color); margin-bottom: 1rem; line-height: 1.2; }
+        .single-post-meta { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; color: var(--text-muted-color); margin-bottom: 2rem; }
+        #single-post-description { line-height: 1.7; font-size: 1.1rem; }
+        #single-post-description h1, #single-post-description h2 { color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin: 2rem 0 1rem 0; }
+        #single-post-description a { color: var(--primary-color); text-decoration: underline; }
+        #single-post-description ul { list-style-position: inside; padding-left: 1rem; margin-bottom: 1rem; }
+        .code-block-wrapper { position: relative; margin: 1.5rem 0; }
+        .code-block-wrapper pre { background-color: var(--background-color); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); padding: 1.5rem; overflow-x: auto; font-family: 'Courier New', Courier, monospace; font-size: 0.95rem; }
+        .copy-code-btn { position: absolute; top: 0.8rem; right: 0.8rem; background: var(--surface-color); color: var(--text-muted-color); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; padding: 0.4rem 0.6rem; transition: var(--transition); opacity: 0.5; }
+        .code-block-wrapper:hover .copy-code-btn { opacity: 1; }
+        .copy-code-btn:hover { background: var(--primary-color); color: #000; }
+        .single-post-cta { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color); display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; }
+
+        /* Modals (Alert & Cropper) */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 9998; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; }
+        .modal-overlay.show { opacity: 1; visibility: visible; }
+        .modal-content-box { background: var(--surface-color); padding: 2.5rem; border-radius: 24px; width: 90%; max-width: 450px; text-align: center; transform: scale(0.9); transition: transform 0.3s ease; }
+        .modal-overlay.show .modal-content-box { transform: scale(1); }
+        .modal-content-box h3 { margin-bottom: 1rem; }
+        .modal-content-box p { color: var(--text-muted-color); margin-bottom: 2rem; }
+        .modal-buttons { display: flex; justify-content: center; gap: 1rem; }
+        #crop-modal .modal-content-box { max-width: 800px; }
+        #crop-image-container { max-width: 100%; max-height: 60vh; margin-bottom: 1.5rem; }
+        #crop-image-container img { max-width: 100%; }
+
+        /* Footer & Toast */
+        footer { padding: 2.5rem 0; margin-top: 3rem; border-top: 1px solid var(--border-color); text-align: center; color: var(--text-muted-color); }
+        footer a { color: var(--text-muted-color); transition: var(--transition); } footer a:hover { color: var(--primary-color); }
+        .toast { position: fixed; bottom: 20px; right: 20px; color: white; padding: 1rem 1.5rem; border-radius: var(--border-radius); z-index: 2000; opacity: 0; transform: translateY(100px); transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); backdrop-filter: blur(10px); display: flex; align-items: center; gap: 1rem; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <div class="header-content">
+            <div class="logo" id="logo-btn">
+                <i class="fas fa-rss-square"></i>
+                <span>Mon Blog</span>
+            </div>
+            <div class="header-actions">
+                <a href="#" class="nav-link" id="home-nav-link"><i class="fas fa-home"></i> Accueil</a>
+                <a href="#" class="nav-link" id="add-post-nav-link"><i class="fas fa-plus"></i> Ajouter</a>
+                <button class="header-btn" id="import-btn"><i class="fas fa-file-import"></i> Importer</button>
+                <button class="header-btn" id="export-btn"><i class="fas fa-file-export"></i> Exporter</button>
+                <button class="header-btn" id="theme-switcher-btn" title="Changer de thème"><i class="fas fa-palette"></i></button>
+                <button class="header-btn" id="reset-all-btn" title="Tout supprimer"><i class="fas fa-trash-alt"></i></button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <!-- Page d'accueil (Liste des catégories/articles) -->
+    <section id="home-page" class="page active">
+        <div class="container">
+            <h2 class="page-title" id="home-page-title"><i class="fas fa-layer-group"></i>Catégories</h2>
+            <div id="home-controls">
+                <button id="back-to-categories-btn" class="btn btn-secondary" style="display: none; margin-bottom: 2rem;"><i class="fas fa-arrow-left"></i> Toutes les catégories</button>
+                <div class="controls-container">
+                    <div class="search-container">
+                        <input type="text" id="search-input" class="search-input" placeholder="Rechercher...">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                    <select id="sort-select" class="filter-select">
+                        <option value="date-desc">Plus récent</option>
+                        <option value="date-asc">Plus ancien</option>
+                        <option value="title-asc">Titre (A-Z)</option>
+                        <option value="title-desc">Titre (Z-A)</option>
+                    </select>
+                </div>
+            </div>
+            <div id="categories-container" class="categories-grid"></div>
+            <div id="post-list-container" class="post-list" style="display: none;"></div>
+        </div>
+    </section>
+
+    <!-- Page d'ajout/modification d'un article -->
+    <section id="add-edit-page" class="page">
+        <div class="container">
+            <h2 class="page-title"><i class="fas fa-pencil-alt"></i><span id="form-title">Ajouter un Article</span></h2>
+            <div class="form-container">
+                <form id="post-form">
+                    <input type="hidden" id="post-id">
+                    <div class="form-group">
+                        <label for="post-title">Titre de l'article *</label>
+                        <input type="text" id="post-title" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="post-category">Catégorie *</label>
+                        <input type="text" id="post-category" class="form-control" placeholder="Ex: Tutoriels, Actualités..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="post-media-url-1">Lien Média Principal (Image/Vidéo YouTube, Drive...)</label>
+                        <input type="url" id="post-media-url-1" class="form-control">
+                    </div>
+                     <div class="form-group">
+                        <label for="post-media-file">...ou choisir une image sur l'appareil</label>
+                        <input type="file" id="post-media-file" class="form-control" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label>Prévisualisation du Média</label>
+                        <div id="media-preview"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="post-description">Description (Markdown supporté)</label>
+                        <textarea id="post-description" class="form-control" placeholder="# Titre&#10;**Gras** *Italique*&#10;- Liste&#10; ```votre code ici```"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="post-fallback-url">Lien de secours / Source (facultatif)</label>
+                        <input type="url" id="post-fallback-url" class="form-control" placeholder="Lien Telegram (t.me), autre source...">
+                    </div>
+                    <div class="form-group">
+                        <label for="post-telegram">Lien Canal Telegram Principal (facultatif)</label>
+                        <input type="url" id="post-telegram" class="form-control" placeholder="https://t.me/moncanal">
+                    </div>
+                     <div class="form-group">
+                        <label for="post-author">Auteur *</label>
+                        <input type="text" id="post-author" class="form-control" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" id="cancel-btn" class="btn btn-secondary">Annuler</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> <span id="save-btn-text">Publier</span></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Page de visualisation d'un article unique -->
+    <section id="single-post-page" class="page">
+        <div class="container">
+            <button id="back-to-list-btn" class="btn btn-secondary" style="margin-bottom: 2rem;"><i class="fas fa-arrow-left"></i> Retour</button>
+            <article>
+                <div id="single-post-media"></div>
+                <h1 id="single-post-title"></h1>
+                <div class="single-post-meta">
+                    <span id="single-post-category"></span>
+                    <span id="single-post-author"></span>
+                    <span id="single-post-date"></span>
+                </div>
+                <div id="single-post-description"></div>
+                <div class="single-post-cta" id="single-post-cta"></div>
+            </article>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2025 Mon Blog. Tous droits réservés.</p>
+        <p><a href="mailto:es2iprompter@gmail.com">Email</a> &bull; <a href="https://wa.me/2250719030672" target="_blank" rel="noopener">WhatsApp</a> &bull; <a href="https://jadpot.com" target="_blank" rel="noopener">Portfolio</a></p>
+    </div>
+</footer>
+
+<!-- Éléments cachés et Modals -->
+<input type="file" id="import-file-input" accept=".json" style="display: none;">
+<div id="toast" class="toast"><i id="toast-icon"></i><span id="toast-message"></span></div>
+
+<div id="custom-alert-overlay" class="modal-overlay">
+    <div class="modal-content-box"><h3 id="custom-alert-title"></h3><p id="custom-alert-message"></p><div id="custom-alert-buttons" class="modal-buttons"></div></div>
+</div>
+
+<div id="crop-modal" class="modal-overlay">
+    <div class="modal-content-box">
+        <h3>Recadrer l'image</h3>
+        <div id="crop-image-container"><img id="crop-image-src" src=""></div>
+        <div class="modal-buttons">
+            <button id="cancel-crop-btn" class="btn btn-secondary">Annuler</button>
+            <button id="apply-crop-btn" class="btn btn-primary"><i class="fas fa-check"></i> Appliquer</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================ JAVASCRIPT INTÉGRÉ ============================ -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // ==========================================
+    // STATE & UI ELEMENTS
+    // ==========================================
+    const appState = { 
+        posts: [], 
+        categories: [],
+        currentView: 'categories', // 'categories' or 'posts'
+        currentCategory: null,
+        editingPostId: null, 
+        currentSort: 'date-desc', 
+        themes: ['default', 'ocean', 'sunset'], 
+        currentThemeIndex: 0,
+        cropperInstance: null
+    };
+
+    const UI = {
+        pages: document.querySelectorAll('.page'),
+        logoBtn: document.getElementById('logo-btn'),
+        homeNavLink: document.getElementById('home-nav-link'),
+        addPostNavLink: document.getElementById('add-post-nav-link'),
+        
+        // Home Page
+        homePageTitle: document.getElementById('home-page-title'),
+        backToCategoriesBtn: document.getElementById('back-to-categories-btn'),
+        categoriesContainer: document.getElementById('categories-container'),
+        postListContainer: document.getElementById('post-list-container'),
+        searchInput: document.getElementById('search-input'),
+        sortSelect: document.getElementById('sort-select'),
+
+        // Form
+        form: document.getElementById('post-form'),
+        formTitle: document.getElementById('form-title'),
+        postId: document.getElementById('post-id'),
+        postTitle: document.getElementById('post-title'),
+        postCategory: document.getElementById('post-category'),
+        postMediaUrl1: document.getElementById('post-media-url-1'),
+        postFallbackUrl: document.getElementById('post-fallback-url'),
+        postMediaFile: document.getElementById('post-media-file'),
+        mediaPreview: document.getElementById('media-preview'),
+        postDescription: document.getElementById('post-description'),
+        postTelegram: document.getElementById('post-telegram'),
+        postAuthor: document.getElementById('post-author'),
+        saveBtnText: document.getElementById('save-btn-text'),
+        cancelBtn: document.getElementById('cancel-btn'),
+
+        // Single Post
+        singlePostMedia: document.getElementById('single-post-media'),
+        singlePostTitle: document.getElementById('single-post-title'),
+        singlePostCategory: document.getElementById('single-post-category'),
+        singlePostAuthor: document.getElementById('single-post-author'),
+        singlePostDate: document.getElementById('single-post-date'),
+        singlePostDescription: document.getElementById('single-post-description'),
+        singlePostCta: document.getElementById('single-post-cta'),
+        backToListBtn: document.getElementById('back-to-list-btn'),
+
+        // Header Buttons
+        importBtn: document.getElementById('import-btn'),
+        exportBtn: document.getElementById('export-btn'),
+        importFileInput: document.getElementById('import-file-input'),
+        themeSwitcherBtn: document.getElementById('theme-switcher-btn'),
+        resetAllBtn: document.getElementById('reset-all-btn'),
+        
+        // Modals & Toasts
+        toast: { el: document.getElementById('toast'), icon: document.getElementById('toast-icon'), msg: document.getElementById('toast-message') },
+        alert: { overlay: document.getElementById('custom-alert-overlay'), title: document.getElementById('custom-alert-title'), msg: document.getElementById('custom-alert-message'), btns: document.getElementById('custom-alert-buttons') },
+        crop: { modal: document.getElementById('crop-modal'), image: document.getElementById('crop-image-src'), applyBtn: document.getElementById('apply-crop-btn'), cancelBtn: document.getElementById('cancel-crop-btn') },
+    };
+
+    // ==========================================
+    // INITIALIZATION
+    // ==========================================
+    function init() {
+        loadTheme();
+        initEventListeners();
+        loadDataFromStorage();
+        updateUI();
+    }
+
+    function initEventListeners() {
+        // Navigation
+        UI.logoBtn.addEventListener('click', () => navigateTo('home-page'));
+        UI.homeNavLink.addEventListener('click', (e) => { e.preventDefault(); navigateTo('home-page'); });
+        UI.addPostNavLink.addEventListener('click', (e) => { e.preventDefault(); prepareForm(); });
+        UI.backToListBtn.addEventListener('click', () => navigateTo('home-page'));
+        UI.backToCategoriesBtn.addEventListener('click', () => { appState.currentCategory = null; updateUI(); });
+
+        // Home Page Controls
+        UI.searchInput.addEventListener('input', updateUI);
+        UI.sortSelect.addEventListener('change', (e) => { appState.currentSort = e.target.value; updateUI(); });
+        
+        // Form
+        UI.form.addEventListener('submit', handleFormSubmit);
+        UI.cancelBtn.addEventListener('click', () => navigateTo('home-page'));
+        UI.postMediaUrl1.addEventListener('input', updateMediaPreview);
+        UI.postMediaFile.addEventListener('change', handleFileSelect);
+        UI.postAuthor.addEventListener('change', (e) => localStorage.setItem('blogAuthorName', e.target.value));
+
+        // Event Delegation for dynamic content
+        document.body.addEventListener('click', handleDynamicClicks);
+
+        // Header Buttons
+        UI.importBtn.addEventListener('click', handleImport);
+        UI.exportBtn.addEventListener('click', handleExport);
+        UI.importFileInput.addEventListener('change', processImportFile);
+        UI.themeSwitcherBtn.addEventListener('click', switchTheme);
+        UI.resetAllBtn.addEventListener('click', handleResetAll);
+        
+        // Cropper
+        UI.crop.applyBtn.addEventListener('click', applyCrop);
+        UI.crop.cancelBtn.addEventListener('click', () => UI.crop.modal.classList.remove('show'));
+    }
+    
+    // ==========================================
+    // DATA MANAGEMENT
+    // ==========================================
+    function loadDataFromStorage() {
+        const savedData = localStorage.getItem('staticBlogData');
+        appState.posts = savedData ? JSON.parse(savedData) : [];
+        updateCategories();
+    }
+
+    function saveDataToStorage() {
+        localStorage.setItem('staticBlogData', JSON.stringify(appState.posts));
+        updateCategories();
+    }
+    
+    function updateCategories() {
+        const categoryCounts = appState.posts.reduce((acc, post) => {
+            const cat = post.category || 'Non classé';
+            acc[cat] = (acc[cat] || 0) + 1;
+            return acc;
+        }, {});
+        appState.categories = Object.entries(categoryCounts).map(([name, count]) => ({ name, count }));
+    }
+
+    // ==========================================
+    // UI & DISPLAY LOGIC
+    // ==========================================
+    function updateUI() {
+        const searchTerm = normalizeString(UI.searchInput.value);
+
+        if (appState.currentCategory) {
+            // View: Posts in a category
+            appState.currentView = 'posts';
+            UI.homePageTitle.innerHTML = `<i class="fas fa-folder-open"></i> Catégorie : ${appState.currentCategory}`;
+            UI.postListContainer.style.display = 'grid';
+            UI.categoriesContainer.style.display = 'none';
+            UI.backToCategoriesBtn.style.display = 'inline-flex';
+            displayPostList(appState.posts.filter(p => (p.category || 'Non classé') === appState.currentCategory), searchTerm);
+        } else {
+            // View: Categories
+            appState.currentView = 'categories';
+            UI.homePageTitle.innerHTML = `<i class="fas fa-layer-group"></i> Catégories`;
+            UI.categoriesContainer.style.display = 'grid';
+            UI.postListContainer.style.display = 'none';
+            UI.backToCategoriesBtn.style.display = 'none';
+            displayCategoryList(searchTerm);
+        }
+    }
+
+    function displayCategoryList(searchTerm = '') {
+        UI.categoriesContainer.innerHTML = '';
+        const filtered = appState.categories.filter(c => normalizeString(c.name).includes(searchTerm));
+        if (filtered.length === 0) {
+            UI.categoriesContainer.innerHTML = `<p style="text-align:center; color: var(--text-muted-color); grid-column: 1 / -1;">Aucune catégorie trouvée.</p>`;
+            return;
+        }
+        filtered.forEach(cat => {
+            const card = document.createElement('div');
+            card.className = 'category-card';
+            card.dataset.category = cat.name;
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="card-icon"><i class="fas fa-folder"></i></div>
+                    <span class="card-count">${cat.count}</span>
+                </div>
+                <h3>${cat.name}</h3>
+                <p>${cat.count} article(s)</p>`;
+            UI.categoriesContainer.appendChild(card);
+        });
+    }
+
+    function displayPostList(posts, searchTerm = '') {
+        let filteredPosts = posts;
+        if (searchTerm) {
+            filteredPosts = posts.filter(post =>
+                normalizeString(post.title).includes(searchTerm) || 
+                normalizeString(post.description).includes(searchTerm) || 
+                normalizeString(post.author).includes(searchTerm)
+            );
+        }
+
+        filteredPosts.sort((a, b) => {
+            switch (appState.currentSort) {
+                case 'date-asc': return new Date(a.createdAt) - new Date(b.createdAt);
+                case 'title-asc': return a.title.localeCompare(b.title);
+                case 'title-desc': return b.title.localeCompare(a.title);
+                default: return new Date(b.createdAt) - new Date(a.createdAt);
+            }
+        });
+
+        UI.postListContainer.innerHTML = '';
+        if (filteredPosts.length === 0) {
+            UI.postListContainer.innerHTML = `<p style="text-align:center; color: var(--text-muted-color); grid-column: 1 / -1;">Aucun article dans cette catégorie.</p>`;
+            return;
+        }
+
+        filteredPosts.forEach(post => {
+            const card = document.createElement('div');
+            card.className = 'post-card';
+            const mediaHTML = getMediaHTML(post, 'card');
+            const truncatedDesc = post.description.substring(0, 120) + (post.description.length > 120 ? '...' : '');
+            const formattedDate = new Date(post.createdAt).toLocaleString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+
+            card.innerHTML = `
+                ${mediaHTML}
+                <div class="post-card-content">
+                    <h3 class="post-card-title">${post.title}</h3>
+                    <div class="post-card-meta"><span><i class="fas fa-user"></i> ${post.author}</span><span><i class="fas fa-clock"></i> ${formattedDate}</span></div>
+                    <p class="post-card-description">${truncatedDesc}</p>
+                    <div class="post-card-footer">
+                        <button class="btn btn-primary read-more-btn" data-id="${post.id}">Voir Plus</button>
+                        <div class="post-card-actions">
+                            <button class="action-btn edit-btn" title="Modifier" data-id="${post.id}"><i class="fas fa-pencil-alt"></i></button>
+                            <button class="action-btn delete-btn" title="Supprimer" data-id="${post.id}"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>`;
+            UI.postListContainer.appendChild(card);
+        });
+    }
+    
+    function displaySinglePost(postId) {
+        const post = appState.posts.find(p => p.id === postId); if(!post) return;
+        
+        UI.singlePostMedia.innerHTML = getMediaHTML(post, 'full');
+        UI.singlePostTitle.textContent = post.title;
+        UI.singlePostCategory.innerHTML = `<i class="fas fa-folder"></i> Catégorie : <strong>${post.category || 'Non classé'}</strong>`;
+        UI.singlePostAuthor.innerHTML = `<i class="fas fa-user"></i> Auteur : <strong>${post.author}</strong>`;
+        UI.singlePostDate.innerHTML = `<i class="fas fa-calendar-alt"></i> Publié le ${new Date(post.createdAt).toLocaleString('fr-FR', { dateStyle: 'full', timeStyle: 'short' })}`;
+        UI.singlePostDescription.innerHTML = renderMarkdown(post.description);
+
+        UI.singlePostCta.innerHTML = '';
+        if (post.fallbackUrl) UI.singlePostCta.innerHTML += `<a href="${post.fallbackUrl}" target="_blank" rel="noopener" class="btn btn-secondary"><i class="fas fa-external-link-alt"></i> Lien de secours / Source</a>`;
+        if (post.telegramUrl) UI.singlePostCta.innerHTML += `<a href="${post.telegramUrl}" target="_blank" rel="noopener" class="btn btn-primary"><i class="fab fa-telegram-plane"></i> Rejoindre le Canal</a>`;
+        
+        navigateTo('single-post-page');
+    }
+
+    // ==========================================
+    // EVENT HANDLERS & ACTIONS
+    // ==========================================
+    function handleDynamicClicks(e) {
+        const readMoreBtn = e.target.closest('.read-more-btn');
+        const editBtn = e.target.closest('.edit-btn');
+        const deleteBtn = e.target.closest('.delete-btn');
+        const categoryCard = e.target.closest('.category-card');
+        const copyBtn = e.target.closest('.copy-code-btn');
+
+        if (readMoreBtn) displaySinglePost(readMoreBtn.dataset.id);
+        else if (editBtn) prepareForm(editBtn.dataset.id);
+        else if (deleteBtn) handleDeletePost(deleteBtn.dataset.id);
+        else if (categoryCard) {
+            appState.currentCategory = categoryCard.dataset.category;
+            updateUI();
+        }
+        else if (copyBtn) {
+            const code = copyBtn.previousElementSibling.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copié !';
+                setTimeout(() => { copyBtn.innerHTML = '<i class="fas fa-copy"></i>'; }, 2000);
+            });
+        }
+    }
+    
+    function navigateTo(pageId) {
+        UI.pages.forEach(p => p.classList.toggle('active', p.id === pageId));
+        UI.homeNavLink.classList.toggle('active', pageId === 'home-page');
+        UI.addPostNavLink.classList.toggle('active', pageId === 'add-edit-page');
+        window.scrollTo(0, 0);
+        if (pageId === 'home-page') {
+            appState.currentCategory = null;
+            updateUI();
+        }
+    }
+    
+    function handleFormSubmit(e) {
+        e.preventDefault();
+        const id = UI.postId.value;
+        const postData = {
+            title: UI.postTitle.value.trim(),
+            category: UI.postCategory.value.trim() || 'Non classé',
+            mediaUrl1: UI.postMediaUrl1.value.trim(),
+            fallbackUrl: UI.postFallbackUrl.value.trim(),
+            mediaData: UI.mediaPreview.querySelector('img')?.src.startsWith('data:') ? UI.mediaPreview.querySelector('img').src : null,
+            description: UI.postDescription.value,
+            telegramUrl: UI.postTelegram.value.trim(),
+            author: UI.postAuthor.value.trim(),
+        };
+
+        if (id) {
+            const index = appState.posts.findIndex(p => p.id === id);
+            appState.posts[index] = { ...appState.posts[index], ...postData, updatedAt: new Date().toISOString() };
+            showToast('Article mis à jour !', 'success');
+        } else {
+            postData.id = 'post-' + Date.now();
+            postData.createdAt = new Date().toISOString();
+            appState.posts.push(postData);
+            showToast('Article publié avec succès !', 'success');
+        }
+        
+        saveDataToStorage();
+        navigateTo('home-page');
+    }
+
+    function prepareForm(postId = null) {
+        UI.form.reset();
+        UI.mediaPreview.innerHTML = '';
+        if (postId) {
+            const post = appState.posts.find(p => p.id === postId); if (!post) return;
+            appState.editingPostId = postId;
+            UI.formTitle.textContent = 'Modifier l\'Article';
+            UI.saveBtnText.textContent = 'Mettre à jour';
+            UI.postId.value = post.id;
+            UI.postTitle.value = post.title;
+            UI.postCategory.value = post.category || '';
+            UI.postMediaUrl1.value = post.mediaUrl1 || '';
+            UI.postFallbackUrl.value = post.fallbackUrl || '';
+            UI.postDescription.value = post.description;
+            UI.postTelegram.value = post.telegramUrl || '';
+            UI.postAuthor.value = post.author;
+            if(post.mediaData) UI.mediaPreview.innerHTML = `<img src="${post.mediaData}" alt="Prévisualisation">`;
+            else updateMediaPreview();
+        } else {
+            appState.editingPostId = null;
+            UI.formTitle.textContent = 'Ajouter un Article';
+            UI.saveBtnText.textContent = 'Publier';
+            UI.postAuthor.value = localStorage.getItem('blogAuthorName') || '';
+        }
+        navigateTo('add-edit-page');
+    }
+    
+    function handleDeletePost(postId) {
+        const post = appState.posts.find(p => p.id === postId); if(!post) return;
+        showConfirmation(`Supprimer "${post.title}"`, 'Êtes-vous sûr de vouloir supprimer cet article ?', [
+            { text: 'Annuler', class: 'btn-secondary', value: false },
+            { text: 'Supprimer', class: 'btn-danger', value: true }
+        ]).then(confirmed => {
+            if(confirmed) {
+                appState.posts = appState.posts.filter(p => p.id !== postId);
+                saveDataToStorage();
+                updateUI();
+                showToast('Article supprimé.', 'success');
+            }
+        });
+    }
+
+    // ==========================================
+    // MEDIA & MARKDOWN
+    // ==========================================
+    function handleFileSelect(e) {
+        const file = e.target.files;
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            UI.crop.image.src = event.target.result;
+            UI.crop.modal.classList.add('show');
+            if (appState.cropperInstance) appState.cropperInstance.destroy();
+            appState.cropperInstance = new Cropper(UI.crop.image, { aspectRatio: 16/9, viewMode: 1, background: false });
+        };
+        reader.readAsDataURL(file);
+    }
+    
+    function applyCrop() {
+        if (!appState.cropperInstance) return;
+        const canvas = appState.cropperInstance.getCroppedCanvas({ width: 1280, imageSmoothingQuality: 'high' });
+        UI.mediaPreview.innerHTML = `<img src="${canvas.toDataURL('image/jpeg', 0.9)}" alt="Prévisualisation">`;
+        UI.postMediaUrl1.value = '';
+        UI.postMediaFile.value = '';
+        UI.crop.modal.classList.remove('show');
+    }
+
+    function updateMediaPreview() {
+        const url1 = UI.postMediaUrl1.value.trim();
+        UI.mediaPreview.innerHTML = '';
+        if (url1) {
+            const embedUrl = getEmbedUrl(url1);
+            if (embedUrl) UI.mediaPreview.innerHTML = `<iframe src="${embedUrl}" allowfullscreen></iframe>`;
+            else UI.mediaPreview.innerHTML = `<img src="${url1}" alt="Prévisualisation">`;
+        }
+    }
+    
+    function getMediaHTML(post, type = 'card') {
+        const sources = [post.mediaData, post.mediaUrl1, post.fallbackUrl];
+        for (const source of sources) {
+            if (!source) continue;
+            const containerClass = type === 'card' ? 'post-card-media' : '';
+            if (source.startsWith('data:')) return `<div class="${containerClass}"><img src="${source}" alt="${post.title}"></div>`;
+            const embedUrl = getEmbedUrl(source);
+            if (embedUrl) return `<div class="${containerClass}"><iframe src="${embedUrl}" allowfullscreen></iframe></div>`;
+            return `<div class="${containerClass}"><img src="${source}" alt="${post.title}" onerror="this.parentElement.style.display='none'"></div>`;
+        }
+        return '';
+    }
+
+    function renderMarkdown(text) {
+        let html = text.replace(/</g, '&lt;').replace(/>/g, '&gt;'); // Basic sanitation
+        html = html
+            .replace(/```([\s\S]*?)```/g, (match, code) => `<div class="code-block-wrapper"><pre><code>${code.trim()}</code></pre><button class="copy-code-btn" title="Copier le code"><i class="fas fa-copy"></i></button></div>`)
+            .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+            .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/^- (.*$)/gim, '<ul><li>$1</li></ul>')
+            .replace(/<\/ul>\s*<ul>/g, ''); // Merge consecutive lists
+        return html;
+    }
+
+    // ==========================================
+    // UTILITIES
+    // ==========================================
+    const getEmbedUrl = (url) => { if(!url) return null; const p = [/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/, /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/, /vimeo\.com\/(\d+)/]; for(let i=0; i<p.length; i++) { const m = url.match(p[i]); if(m) { switch(i) { case 0: return `https://drive.google.com/file/d/${m[1]}/preview`; case 1: return `https://www.youtube.com/embed/${m[1]}`; case 2: return `https://player.vimeo.com/video/${m[1]}`; }}} return null; };
+    const normalizeString = (str) => typeof str === 'string' ? str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : '';
+    function showToast(message, type = 'success') { const t=UI.toast, c={s:'var(--success-color)',d:'var(--danger-color)',w:'var(--warning-color)'}, i={s:'fa-check-circle',d:'fa-times-circle',w:'fa-exclamation-triangle'}; t.el.style.background=c[type.charAt(0)]||c.s; t.icon.className=`fas ${i[type.charAt(0)]||i.s}`; t.msg.textContent=message; t.el.classList.add('show'); setTimeout(()=>t.el.classList.remove('show'),3000); }
+    function showConfirmation(title, msg, buttons) { return new Promise(resolve => { const a=UI.alert; a.title.textContent=title; a.msg.textContent=msg; a.btns.innerHTML=''; buttons.forEach(bI => { const btn=document.createElement('button'); btn.className=`btn ${bI.class}`; btn.innerHTML=bI.text; btn.onclick=()=>{a.overlay.classList.remove('show'); resolve(bI.value);}; a.btns.appendChild(btn); }); a.overlay.classList.add('show'); }); }
+
+    // ==========================================
+    // IMPORT, EXPORT, THEME, RESET
+    // ==========================================
+    async function handleImport() {
+        const result = await showConfirmation('Importer des Articles', 'Comment voulez-vous importer ?', [{ text: 'Annuler', class: 'btn-secondary', value: 'cancel' }, { text: 'Fusionner', class: 'btn-primary', value: 'merge' }, { text: 'Écraser', class: 'btn-danger', value: 'overwrite' }]);
+        if (result !== 'cancel') { UI.importFileInput.dataset.mode = result; UI.importFileInput.click(); }
+    }
+    function processImportFile(e) { const file = e.target.files, mode = e.target.dataset.mode; if (!file) return; const reader = new FileReader(); reader.onload = (event) => { try { const data = JSON.parse(event.target.result); if (!Array.isArray(data)) throw new Error(); if (mode === 'overwrite') { appState.posts = data; showToast('Données écrasées !', 'success'); } else { const ids = new Set(appState.posts.map(p => p.id)); const newPosts = data.filter(p => !ids.has(p.id)); appState.posts.push(...newPosts); showToast(`${newPosts.length} article(s) ajouté(s).`, 'success'); } saveDataToStorage(); navigateTo('home-page'); } catch { showToast('Fichier JSON invalide.', 'error'); } }; reader.readAsText(file); e.target.value = ''; }
+    function handleExport() { if(appState.posts.length === 0) return showToast('Aucun article à exporter.', 'warning'); const dataStr = JSON.stringify(appState.posts, null, 2); const blob = new Blob([dataStr], {type: 'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `blog-export-${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url); }
+    function switchTheme() { appState.currentThemeIndex = (appState.currentThemeIndex + 1) % appState.themes.length; const newTheme = appState.themes[appState.currentThemeIndex]; document.documentElement.setAttribute('data-theme', newTheme); localStorage.setItem('blogTheme', newTheme); }
+    function loadTheme() { const savedTheme = localStorage.getItem('blogTheme') || 'default'; const themeIndex = appState.themes.indexOf(savedTheme); appState.currentThemeIndex = themeIndex !== -1 ? themeIndex : 0; document.documentElement.setAttribute('data-theme', appState.themes[appState.currentThemeIndex]); }
+    function handleResetAll() { showConfirmation('Supprimer Tout', 'Ceci supprimera tous les articles. Continuer ?', [{ text: 'Annuler', class: 'btn-secondary', value: false }, { text: 'Tout Supprimer', class: 'btn-danger', value: true }]).then(confirmed => { if(confirmed) { appState.posts = []; saveDataToStorage(); updateUI(); showToast('Tous les articles ont été supprimés.', 'success'); }}); }
+    
+    // Launch App
+    init();
+});
+</script>
+
+</body>
+</html>
