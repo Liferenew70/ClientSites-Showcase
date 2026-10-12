@@ -1,27 +1,7 @@
-# Dependances
 node_modules/
-.npm
-.cache/
-
-# Fichiers sensibles
-.env
-.env.*
-!.env.example
-*.key
-*.pem
-credentials.json
-
-# Fichiers volumineux ou archives
+.env*
 *.zip
 *.rar
-*.7z
-*.tar.gz
-*.iso
-
-# Logs et OS
-logs/
+*.mp4
+*.exe
 *.log
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
